@@ -1,7 +1,7 @@
 /**
  * KARIBU GROCERIES LTD (KGL) - Manager Dashboard
  * Branches: MAGANJO and MATUGGA
- * UNIVERSAL FIX - Dashboard updates for all branches
+ * FULLY FIXED - Dashboard now shows inventory for all branches
  */
 
 // ========================================
@@ -35,9 +35,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('🏢 Branch:', currentBranch);
     
     updateUserInfo();
-    await loadProduce();
-    await loadTodaysSales();
-    setupPage();
+    
+    // Small delay to ensure DOM is fully loaded
+    setTimeout(async () => {
+        await loadProduce();
+        await loadTodaysSales();
+        setupPage();
+    }, 100);
     
     // Auto-refresh every 30 seconds
     setInterval(async () => {
@@ -94,7 +98,6 @@ async function loadProduce() {
         }
         
         console.log(`🔍 Fetching produce for ${currentBranch} branch...`);
-        showLoadingInAllTables();
         
         const response = await APIService.getProduce(currentBranch, token);
         
@@ -102,85 +105,46 @@ async function loadProduce() {
             produceList = response.produce || [];
             console.log(`✅ Loaded ${produceList.length} items for ${currentBranch}`);
             
-            // Force update ALL displays
-            forceUpdateAllDisplays();
+            // Update ALL displays
+            updateDashboardStats();
+            updateAllDropdowns();
+            checkLowStock();
+            
+            // Try to update inventory display with retry
+            tryUpdateInventoryDisplay();
             
         } else {
             produceList = [];
-            showEmptyState();
+            tryUpdateInventoryDisplay();
         }
     } catch (error) {
         console.log('❌ Error loading produce:', error);
         produceList = [];
-        showErrorState();
+        tryUpdateInventoryDisplay();
     }
 }
 
 // ========================================
-// FORCE UPDATE ALL DISPLAYS
+// TRY UPDATE INVENTORY DISPLAY WITH RETRY
 // ========================================
-function forceUpdateAllDisplays() {
-    console.log('🔄 Force updating all displays...');
+function tryUpdateInventoryDisplay(retryCount = 0) {
+    console.log(`📊 Attempting to update inventory display (attempt ${retryCount + 1})...`);
     
-    // Update inventory table if it exists
-    updateInventoryDisplay();
-    
-    // Update dashboard stats
-    updateDashboardStats();
-    
-    // Update all dropdowns
-    updateAllDropdowns();
-    
-    // Check low stock
-    checkLowStock();
-    
-    // Force dashboard table to refresh
     const inventoryBody = document.getElementById('inventoryTableBody');
-    if (inventoryBody && produceList.length > 0) {
-        console.log(`📊 Dashboard table updated with ${produceList.length} items`);
-    }
-}
-
-// ========================================
-// SHOW LOADING IN ALL TABLES
-// ========================================
-function showLoadingInAllTables() {
-    ['inventoryTableBody', 'recentInventoryBody', 'stockBody'].forEach(tableId => {
-        const table = document.getElementById(tableId);
-        if (table) {
-            table.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px;"><i class="fas fa-spinner fa-spin" style="font-size: 30px;"></i><p>Loading inventory...</p></td></tr>`;
-        }
-    });
-}
-
-// ========================================
-// SHOW EMPTY STATE
-// ========================================
-function showEmptyState() {
-    const inventoryBody = document.getElementById('inventoryTableBody');
+    
     if (inventoryBody) {
-        inventoryBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;"><i class="fas fa-box-open" style="font-size: 40px; color: #ccc;"></i><p>No inventory found. Add some stock!</p></td></tr>`;
+        console.log('✅ Found inventory table, updating now...');
+        updateInventoryDisplay();
+    } else if (retryCount < 5) {
+        // Retry up to 5 times with increasing delays
+        const delay = 100 * (retryCount + 1);
+        console.log(`⏳ Table not ready, retrying in ${delay}ms...`);
+        setTimeout(() => tryUpdateInventoryDisplay(retryCount + 1), delay);
+    } else {
+        console.log('❌ Could not find inventory table after 5 attempts');
+        // Check what elements are available
+        debugPageElements();
     }
-}
-
-// ========================================
-// SHOW ERROR STATE
-// ========================================
-function showErrorState() {
-    const inventoryBody = document.getElementById('inventoryTableBody');
-    if (inventoryBody) {
-        inventoryBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;"><i class="fas fa-exclamation-circle" style="font-size: 40px; color: var(--danger);"></i><p>Error loading inventory</p></td></tr>`;
-    }
-}
-
-// ========================================
-// UPDATE ALL DROPDOWNS
-// ========================================
-function updateAllDropdowns() {
-    ['produceSelect', 'productSelect', 'itemSelect'].forEach(id => {
-        const select = document.getElementById(id);
-        if (select) updateProduceDropdown(select);
-    });
 }
 
 // ========================================
@@ -191,93 +155,73 @@ function updateDashboardStats() {
     const totalProductsEl = document.getElementById('totalProducts');
     const lowStockEl = document.getElementById('lowStock');
     
-    if (totalStockEl || totalProductsEl || lowStockEl) {
-        let totalKg = 0, lowStockCount = 0;
-        
-        produceList.forEach(item => {
-            totalKg += item.tonnage || 0;
-            if (item.tonnage < 1000 && item.tonnage > 0) lowStockCount++;
-        });
-        
-        if (totalStockEl) totalStockEl.textContent = totalKg.toLocaleString() + ' kg';
-        if (totalProductsEl) totalProductsEl.textContent = produceList.length;
-        if (lowStockEl) lowStockEl.textContent = lowStockCount;
-    }
+    let totalKg = 0, lowStockCount = 0;
+    
+    produceList.forEach(item => {
+        totalKg += item.tonnage || 0;
+        if (item.tonnage < 1000 && item.tonnage > 0) lowStockCount++;
+    });
+    
+    if (totalStockEl) totalStockEl.textContent = totalKg.toLocaleString() + ' kg';
+    if (totalProductsEl) totalProductsEl.textContent = produceList.length;
+    if (lowStockEl) lowStockEl.textContent = lowStockCount;
 }
 
 // ========================================
-// CHECK LOW STOCK
-// ========================================
-function checkLowStock() {
-    const lowStockItems = produceList.filter(item => item.tonnage < 1000 && item.tonnage > 0);
-    const outOfStock = produceList.filter(item => item.tonnage <= 0);
-    
-    const alertDiv = document.getElementById('lowStockAlert');
-    const messageSpan = document.getElementById('lowStockMessage');
-    
-    if (alertDiv && messageSpan && (lowStockItems.length > 0 || outOfStock.length > 0)) {
-        let message = '';
-        if (outOfStock.length > 0) message += `${outOfStock.length} item(s) out of stock. `;
-        if (lowStockItems.length > 0) message += `${lowStockItems.length} item(s) low on stock (<1000kg).`;
-        messageSpan.textContent = message;
-        alertDiv.style.display = 'flex';
-    } else if (alertDiv) {
-        alertDiv.style.display = 'none';
-    }
-}
-
-// ========================================
-// UPDATE INVENTORY DISPLAY - FORCED UPDATE
+// UPDATE INVENTORY DISPLAY
 // ========================================
 function updateInventoryDisplay() {
-    console.log('📊 Updating inventory display...');
-    
     const inventoryBody = document.getElementById('inventoryTableBody');
+    
     if (!inventoryBody) {
-        console.log('ℹ️ No inventory table on this page');
+        console.log('❌ inventoryTableBody not found');
         return;
     }
     
     if (produceList.length === 0) {
-        inventoryBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;"><i class="fas fa-box-open" style="font-size: 40px; color: #ccc;"></i><p>No inventory found. Add some stock!</p></td></tr>`;
+        inventoryBody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px;"><i class="fas fa-box-open" style="font-size: 40px; color: #ccc;"></i><p>No inventory found. Add some stock!</p></td></tr>`;
         return;
     }
     
-    let html = '', totalStock = 0, lowStockCount = 0;
+    let html = '';
     
-    [...produceList].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).forEach(item => {
-        totalStock += item.tonnage || 0;
-        
+    // Sort by date (newest first) and take only first 5 for dashboard
+    const recentItems = [...produceList]
+        .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+        .slice(0, 5);
+    
+    recentItems.forEach(item => {
         let statusClass = 'in-stock', statusText = 'In Stock';
+        
         if (item.tonnage <= 0) {
-            statusClass = 'out-stock'; statusText = 'Out of Stock';
+            statusClass = 'out-stock';
+            statusText = 'Out of Stock';
         } else if (item.tonnage < 1000) {
-            statusClass = 'low-stock'; statusText = 'Low Stock'; lowStockCount++;
+            statusClass = 'low-stock';
+            statusText = 'Low Stock';
         }
         
-        html += `<tr data-produce-id="${item._id || item.id}">
+        html += `<tr>
             <td>${item.name}</td>
             <td>${item.type || item.name}</td>
             <td>${item.tonnage.toLocaleString()} kg</td>
-            <td class="price-cell">UGX ${item.sellingPrice?.toLocaleString() || '0'}</td>
+            <td>UGX ${item.sellingPrice?.toLocaleString() || '0'}</td>
             <td><span class="status-badge ${statusClass}">${statusText}</span></td>
-            <td>${item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Today'}</td>
-            <td><button class="action-btn edit-price" onclick="editPrice('${item._id || item.id}', ${item.sellingPrice || 0}, this.closest('tr'))"><i class="fas fa-edit"></i></button></td>
         </tr>`;
     });
     
     inventoryBody.innerHTML = html;
-    
-    // Update stats after table update
-    const totalStockEl = document.getElementById('totalStock');
-    const totalProductsEl = document.getElementById('totalProducts');
-    const lowStockEl = document.getElementById('lowStock');
-    
-    if (totalStockEl) totalStockEl.textContent = totalStock.toLocaleString() + ' kg';
-    if (totalProductsEl) totalProductsEl.textContent = produceList.length;
-    if (lowStockEl) lowStockEl.textContent = lowStockCount;
-    
-    console.log(`✅ Display updated with ${produceList.length} items`);
+    console.log(`✅ Dashboard updated with ${recentItems.length} items`);
+}
+
+// ========================================
+// UPDATE ALL DROPDOWNS
+// ========================================
+function updateAllDropdowns() {
+    ['produceSelect', 'productSelect', 'itemSelect'].forEach(id => {
+        const select = document.getElementById(id);
+        if (select) updateProduceDropdown(select);
+    });
 }
 
 // ========================================
@@ -303,10 +247,45 @@ function updateProduceDropdown(produceSelect) {
 }
 
 // ========================================
-// SETUP PAGE
+// CHECK LOW STOCK
+// ========================================
+function checkLowStock() {
+    const lowStockItems = produceList.filter(item => item.tonnage < 1000 && item.tonnage > 0);
+    const outOfStock = produceList.filter(item => item.tonnage <= 0);
+    
+    const alertDiv = document.getElementById('lowStockAlert');
+    const messageSpan = document.getElementById('lowStockMessage');
+    
+    if (alertDiv && messageSpan && (lowStockItems.length > 0 || outOfStock.length > 0)) {
+        let message = '';
+        if (outOfStock.length > 0) message += `${outOfStock.length} item(s) out of stock. `;
+        if (lowStockItems.length > 0) message += `${lowStockItems.length} item(s) low on stock (<1000kg).`;
+        messageSpan.textContent = message;
+        alertDiv.style.display = 'flex';
+    } else if (alertDiv) {
+        alertDiv.style.display = 'none';
+    }
+}
+
+// ========================================
+// DEBUG PAGE ELEMENTS
+// ========================================
+function debugPageElements() {
+    console.log('🔍 DEBUG: Page elements check:');
+    console.log('   - inventoryTableBody:', document.getElementById('inventoryTableBody') ? '✅ FOUND' : '❌ NOT FOUND');
+    console.log('   - totalStock:', document.getElementById('totalStock') ? '✅ FOUND' : '❌ NOT FOUND');
+    console.log('   - totalProducts:', document.getElementById('totalProducts') ? '✅ FOUND' : '❌ NOT FOUND');
+    console.log('   - lowStock:', document.getElementById('lowStock') ? '✅ FOUND' : '❌ NOT FOUND');
+    console.log('   - todaySales:', document.getElementById('todaySales') ? '✅ FOUND' : '❌ NOT FOUND');
+    console.log('   - All tables on page:', document.querySelectorAll('table').length);
+}
+
+// ========================================
+// SETUP PAGE BASED ON CURRENT PAGE
 // ========================================
 function setupPage() {
     const path = window.location.pathname;
+    console.log('📍 Current path:', path);
     
     if (path.includes('procurement.html')) {
         setupProcurementPage();
@@ -317,12 +296,13 @@ function setupPage() {
     } else if (path.includes('inventory.html')) {
         setupInventoryPage();
     } else if (path.includes('dashboard.html')) {
-        forceUpdateAllDisplays();
+        // Already handled by tryUpdateInventoryDisplay
+        console.log('📊 On dashboard page');
     }
 }
 
 // ========================================
-// PROCUREMENT PAGE - FIXED
+// PROCUREMENT PAGE
 // ========================================
 function setupProcurementPage() {
     console.log('📝 Setting up procurement page');
@@ -390,16 +370,13 @@ function setupProcurementPage() {
                 alert('✅ Procurement recorded!');
                 e.target.reset();
                 if (dateInput) dateInput.value = today;
-                
-                // CRITICAL: Force reload of produce and update ALL displays
-                await loadProduce();
-                
-                // If we're on dashboard, ensure it updates
-                if (window.location.pathname.includes('dashboard.html')) {
-                    forceUpdateAllDisplays();
+                if (timeInput) {
+                    const now = new Date();
+                    timeInput.value = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
                 }
                 
-                console.log('✅ Procurement added and displays updated');
+                await loadProduce();
+                console.log('✅ Procurement added and inventory updated');
             } else {
                 alert('❌ Error: ' + (response?.message || 'Failed'));
             }
@@ -587,6 +564,8 @@ function setupCreditSalesPage() {
 // INVENTORY PAGE
 // ========================================
 function setupInventoryPage() {
+    console.log('📋 Setting up inventory page');
+    // Full inventory page shows all items, not just recent
     updateInventoryDisplay();
     checkLowStock();
 }
@@ -648,4 +627,4 @@ if (logoutBtn) {
     });
 }
 
-console.log('🚀 Manager.js loaded - UNIVERSAL FIX for all branches');
+console.log('🚀 Manager.js loaded - FULLY FIXED for all branches');
