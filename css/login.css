@@ -1,0 +1,528 @@
+/* ========================================
+   KGL Groceries LTD - Login Page CSS
+   Student-Friendly, Well-Commented
+   Following SRD Document
+======================================== */
+
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ===== RESET STYLES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===== COLOR VARIABLES ===== */
+:root {
+    --navy-dark: #0B1E33;      /* Dark navy - main brand color */
+    --navy-medium: #1A2F4A;    /* Medium navy - for gradients */
+    --gold-primary: #D4AF37;    /* Gold - accent color */
+    --gold-light: #E5C87B;      /* Light gold - for hover */
+    --white: #FFFFFF;           /* White */
+    --gray-light: #F5F7FA;      /* Light gray - backgrounds */
+    --gray-medium: #E1E5EB;     /* Medium gray - borders */
+    --gray-dark: #6B7280;       /* Dark gray - text */
+    --danger: #EF4444;          /* Red - error messages */
+    --success: #10B981;         /* Green - success messages */
+}
+
+/* ===== BODY STYLES ===== */
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--navy-dark), var(--navy-medium));
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* ===== LOGIN CARD ===== */
+.login-card {
+    width: 100%;
+    max-width: 1000px;
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    display: flex;
+    overflow: hidden;
+}
+
+/* ===== LEFT SECTION (BLUE SIDE) ===== */
+.left-section {
+    flex: 1;
+    background: linear-gradient(145deg, var(--navy-dark), var(--navy-medium));
+    padding: 40px;
+    color: var(--white);
+}
+
+.left-section h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.left-section h1 span {
+    color: var(--gold-primary);
+    display: block;
+    font-size: 24px;
+    font-weight: 400;
+    margin-top: 5px;
+}
+
+.left-section p {
+    margin: 20px 0;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+/* ===== BRANCH INFO - From SRD ===== */
+.branch-box {
+    background: rgba(212, 175, 55, 0.1);
+    border-left: 4px solid var(--gold-primary);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 25px 0;
+}
+
+.branch-box h3 {
+    color: var(--gold-primary);
+    margin-bottom: 15px;
+}
+
+.branch-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.branch-item i {
+    color: var(--gold-primary);
+    width: 20px;
+}
+
+/* ===== PRODUCTS LIST - From SRD ===== */
+.products {
+    margin-top: 25px;
+}
+
+.products h3 {
+    color: var(--gold-primary);
+    margin-bottom: 15px;
+}
+
+.product-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tag {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 14px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+/* ===== RIGHT SECTION (WHITE SIDE) ===== */
+.right-section {
+    flex: 1;
+    padding: 40px;
+}
+
+.right-section h2 {
+    color: var(--navy-dark);
+    font-size: 28px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.right-section > p {
+    color: var(--gray-dark);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* ===== FORM STYLES ===== */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--navy-dark);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-group label i {
+    color: var(--gold-primary);
+    margin-right: 8px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 12px 15px;
+    padding-right: 45px;
+    border: 2px solid var(--gray-medium);
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.3s;
+}
+
+.input-wrapper input:focus {
+    outline: none;
+    border-color: var(--gold-primary);
+}
+
+.input-wrapper input.error {
+    border-color: var(--danger);
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--gray-dark);
+    cursor: pointer;
+}
+
+.validation-message {
+    font-size: 12px;
+    color: var(--danger);
+    margin-top: 5px;
+    display: block;
+}
+
+/* ===== FORM OPTIONS ===== */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--gray-dark);
+    cursor: pointer;
+}
+
+.remember-me input {
+    accent-color: var(--gold-primary);
+}
+
+.forgot-link {
+    color: var(--navy-dark);
+    text-decoration: none;
+}
+
+.forgot-link:hover {
+    color: var(--gold-primary);
+}
+
+/* ===== LOGIN BUTTON ===== */
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--navy-dark);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.login-btn:hover {
+    background: var(--navy-medium);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(11, 30, 51, 0.3);
+}
+
+.login-btn.loading {
+    position: relative;
+    color: transparent;
+}
+
+.login-btn.loading::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 3px solid var(--white);
+    border-top-color: var(--gold-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ===== ERROR MESSAGE ===== */
+.error-message {
+    background: #FEE2E2;
+    color: var(--danger);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+/* ===== DEMO BADGES ===== */
+.demo-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--gray-medium);
+}
+
+.demo-section p {
+    text-align: center;
+    color: var(--gray-dark);
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.badge-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.badge {
+    padding: 8px 15px;
+    background: var(--gray-light);
+    border-radius: 30px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s;
+    border: 1px solid transparent;
+}
+
+.badge:hover {
+    background: var(--gold-light);
+    transform: scale(1.05);
+}
+
+.badge.director {
+    border-left: 3px solid var(--gold-primary);
+}
+
+.badge.manager {
+    border-left: 3px solid var(--navy-dark);
+}
+
+.badge.sales {
+    border-left: 3px solid var(--success);
+}
+
+/* ===== FOOTER STYLES ===== */
+.footer {
+    background: var(--navy-dark);
+    color: var(--white);
+    padding: 40px 20px 20px;
+    border-top: 3px solid var(--gold-primary);
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 30px;
+}
+
+.footer-section h3 {
+    color: var(--gold-primary);
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.footer-section p {
+    color: var(--gray-medium);
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.branch-address {
+    background: rgba(212, 175, 55, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.branch-address p {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+}
+
+.branch-address i {
+    color: var(--gold-primary);
+}
+
+.social-links {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.social-link {
+    width: 35px;
+    height: 35px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.social-link:hover {
+    background: var(--gold-primary);
+    color: var(--navy-dark);
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: var(--gray-medium);
+    text-decoration: none;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--gold-primary);
+    transform: translateX(5px);
+}
+
+.footer-links i {
+    font-size: 12px;
+    color: var(--gold-primary);
+}
+
+.contact-info {
+    list-style: none;
+}
+
+.contact-info li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    color: var(--gray-medium);
+    font-size: 14px;
+}
+
+.contact-info i {
+    color: var(--gold-primary);
+    width: 20px;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 30px;
+    padding-top: 20px;
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 13px;
+    color: var(--gray-medium);
+}
+
+.footer-bottom-links {
+    display: flex;
+    gap: 20px;
+}
+
+.footer-bottom-links a {
+    color: var(--gray-medium);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-bottom-links a:hover {
+    color: var(--gold-primary);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 900px) {
+    .login-card {
+        flex-direction: column;
+    }
+    
+    .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .badge-container {
+        flex-direction: column;
+    }
+    
+    .badge {
+        justify-content: center;
+    }
+}

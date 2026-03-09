@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KGL - Director Dashboard</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- ✅ FIXED: Correct path to CSS -->
+    <link rel="stylesheet" href="../../css/director.css">
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>KARIBU GROCERIES</h2>
+            <p>Director Panel</p>
+            <span>Mr. Orban</span>
+        </div>
+        
+        <div class="sidebar-menu">
+            <!-- ✅ FIXED: All links use same folder -->
+            <a href="dashboard.html" class="menu-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="users.html" class="menu-item">
+                <i class="fas fa-users-cog"></i>
+                <span>Manage Users</span>
+            </a>
+            <a href="reports.html" class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Sales Reports</span>
+            </a>
+            <a href="branches.html" class="menu-item">
+                <i class="fas fa-store"></i>
+                <span>Branches</span>
+            </a>
+            <a href="stock-overview.html" class="menu-item">
+                <i class="fas fa-seedling"></i>
+                <span>Stock Overview</span>
+            </a>
+        </div>
+        
+        <!-- Branch Indicator -->
+        <div class="branch-indicator">
+            <h4><i class="fas fa-map-marker-alt"></i> BRANCHES</h4>
+            <div class="branch-chip">
+                <i class="fas fa-check-circle"></i>
+                <span>MAGANJO Branch</span>
+            </div>
+            <div class="branch-chip">
+                <i class="fas fa-check-circle"></i>
+                <span>MATUGGA Branch</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="page-title">
+                <h1>Director Dashboard</h1>
+                <p><i class="fas fa-eye"></i> Viewing aggregated reports only (as per SRD)</p>
+            </div>
+            <div class="user-info">
+                <div class="user-badge">
+                    <i class="fas fa-user-tie"></i>
+                    <span id="userName">Mr. Orban</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Users</h3>
+                    <p id="totalUsers">7</p>
+                    <small>+0 this week</small>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-store"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Branches</h3>
+                    <p>2</p>
+                    <small>MAGANJO | MATUGGA</small>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Sales</h3>
+                    <p>UGX 0</p>
+                    <small>This month</small>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Credit Sales</h3>
+                    <p>UGX 0</p>
+                    <small>Pending payments</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Branch Overview (MAGANJO) -->
+        <div class="branch-section">
+            <div class="branch-header">
+                <h2><i class="fas fa-map-pin"></i> MAGANJO Branch Overview</h2>
+                <span class="branch-badge">Manager: John Manager</span>
+            </div>
+            
+            <div class="stats-grid" style="margin-bottom: 0;">
+                <div class="stat-card" style="padding: 15px;">
+                    <div class="stat-info">
+                        <h3>Sales Agents</h3>
+                        <p>2</p>
+                    </div>
+                </div>
+                <div class="stat-card" style="padding: 15px;">
+                    <div class="stat-info">
+                        <h3>Stock Value</h3>
+                        <p>UGX 0</p>
+                    </div>
+                </div>
+                <div class="stat-card" style="padding: 15px;">
+                    <div class="stat-info">
+                        <h3>Today's Sales</h3>
+                        <p>UGX 0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Branch Overview (MATUGGA) -->
+        <div class="branch-section">
+            <div class="branch-header">
+                <h2><i class="fas fa-map-pin"></i> MATUGGA Branch Overview</h2>
+                <span class="branch-badge">Manager: Sarah Manager</span>
+            </div>
+            
+            <div class="stats-grid" style="margin-bottom: 0;">
+                <div class="stat-card" style="padding: 15px;">
+                    <div class="stat-info">
+                        <h3>Sales Agents</h3>
+                        <p>2</p>
+                    </div>
+                </div>
+                <div class="stat-card" style="padding: 15px;">
+                    <div class="stat-info">
+                        <h3>Stock Value</h3>
+                        <p>UGX 0</p>
+                    </div>
+                </div>
+                <div class="stat-card" style="padding: 15px;">
+                    <div class="stat-info">
+                        <h3>Today's Sales</h3>
+                        <p>UGX 0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div style="display: flex; gap: 15px; justify-content: flex-end;">
+            <a href="users.html" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i>
+                Manage Users (Create Managers & Agents)
+            </a>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <div class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+        
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth <= 768) {
+                if (sidebar && menuBtn && !sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+        
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+    </script>
+    
+    <!-- ✅ FIXED: JavaScript paths -->
+    <script src="../../js/api-config.js"></script>
+    <script src="../../js/utilities.js"></script>
+    <script src="../../js/director.js"></script>
+</body>
+</html>

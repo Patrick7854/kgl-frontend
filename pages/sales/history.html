@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KGL - My Sales History</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- ✅ FIXED: Correct path to CSS -->
+    <link rel="stylesheet" href="../../css/sales.css">
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>KARIBU GROCERIES</h2>
+            <p>Sales Agent</p>
+            <div class="branch-name" id="branchName">MAGANJO Branch</div>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="newsale.html" class="menu-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>New Sale</span>
+            </a>
+            <a href="creditsale.html" class="menu-item">
+                <i class="fas fa-credit-card"></i>
+                <span>Credit Sale</span>
+            </a>
+            <a href="history.html" class="menu-item active">
+                <i class="fas fa-history"></i>
+                <span>My Sales</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="page-title">
+                <h1>My Sales History</h1>
+                <p><i class="fas fa-store"></i> Branch: <span id="branchDisplay">MAGANJO Branch</span></p>
+            </div>
+            <div class="user-info">
+                <div class="user-badge">
+                    <i class="fas fa-user-tag"></i>
+                    <span id="userName">Loading...</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="section-card">
+            <div class="form-row" style="margin-bottom: 0;">
+                <div class="form-group">
+                    <label for="filterType">
+                        <i class="fas fa-filter"></i> Filter by
+                    </label>
+                    <select id="filterType">
+                        <option value="all">All Sales</option>
+                        <option value="cash">Cash Sales Only</option>
+                        <option value="credit">Credit Sales Only</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dateFilter">
+                        <i class="fas fa-calendar"></i> Date
+                    </label>
+                    <input type="date" id="dateFilter">
+                </div>
+                
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <button class="btn btn-primary" id="applyFilter">
+                        <i class="fas fa-search"></i> Apply Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Table -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-history"></i> My Sales Records</h2>
+                <span class="badge" id="totalAmount">Total: UGX 0</span>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date/Time</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Amount</th>
+                            <th>Buyer</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salesHistoryBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center;">Loading sales history...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <div class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+        
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth <= 768) {
+                if (sidebar && menuBtn && !sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+        
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = window.location.pathname.split('/').pop();
+            const menuItems = document.querySelectorAll('.menu-item, .nav-item');
+            
+            menuItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href && href.includes(currentPage)) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+    <!-- ✅ FIXED: JavaScript paths -->
+    <script src="../../js/api-config.js"></script>
+    <script src="../../js/utilities.js"></script>
+    <script src="../../js/sales.js"></script>
+</body>
+</html>

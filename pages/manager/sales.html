@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KGL - Record Sale</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- ✅ FIXED: Correct path to CSS -->
+    <link rel="stylesheet" href="../../css/manager.css">
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>KARIBU GROCERIES</h2>
+            <p>Manager Panel</p>
+            <div class="branch-name" id="branchName">MAGANJO Branch</div>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="procurement.html" class="menu-item">
+                <i class="fas fa-truck-loading"></i>
+                <span>Record Procurement</span>
+            </a>
+            <a href="inventory.html" class="menu-item">
+                <i class="fas fa-boxes"></i>
+                <span>Inventory</span>
+            </a>
+            <a href="sales.html" class="menu-item active">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Record Sale</span>
+            </a>
+            <a href="creditsales.html" class="menu-item">
+                <i class="fas fa-credit-card"></i>
+                <span>Credit Sale</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="page-title">
+                <h1>Record Sale</h1>
+                <p><i class="fas fa-store"></i> Selling from: <span id="branchDisplay">MAGANJO Branch</span></p>
+            </div>
+            <div class="user-info">
+                <div class="user-badge">
+                    <i class="fas fa-user-cog"></i>
+                    <span id="userName">Loading...</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Sale Form -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-shopping-cart"></i> New Sale</h2>
+            </div>
+            
+            <div class="form-container">
+                <form id="saleForm">
+                    <div class="form-group">
+                        <label for="produceSelect">
+                            <i class="fas fa-seedling"></i> Select Produce
+                        </label>
+                        <select id="produceSelect" required>
+                            <option value="">Select Produce</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quantity">
+                                <i class="fas fa-weight"></i> Quantity (kg)
+                            </label>
+                            <input type="number" id="quantity" placeholder="e.g., 100" min="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="amountPaid">
+                                <i class="fas fa-money-bill"></i> Amount Paid (UGX)
+                            </label>
+                            <input type="number" id="amountPaid" placeholder="e.g., 500000" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="buyerName">
+                            <i class="fas fa-user"></i> Buyer Name
+                        </label>
+                        <input type="text" id="buyerName" placeholder="Buyer name" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success btn-block">
+                        <i class="fas fa-save"></i> Record Sale
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <div class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+        
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth <= 768) {
+                if (sidebar && menuBtn && !sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+        
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = window.location.pathname.split('/').pop();
+            const menuItems = document.querySelectorAll('.menu-item, .nav-item');
+            
+            menuItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href && href.includes(currentPage)) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+    
+    <!-- ✅ FIXED: JavaScript paths -->
+    <script src="../../js/api-config.js"></script>
+    <script src="../../js/utilities.js"></script>
+    <script src="../../js/manager.js"></script>
+</body>
+</html>

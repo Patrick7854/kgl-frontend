@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KARIBU GROCERIES LTD (KGL)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0B1E33, #1A2F4A);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: #D4AF37;
+        }
+
+        h1 span {
+            color: white;
+            font-size: 24px;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .loader {
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-top: 5px solid #D4AF37;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        p {
+            margin: 10px 0;
+            color: #E5C87B;
+        }
+
+        .note {
+            font-size: 14px;
+            color: #6B7280;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>
+            KARIBU GROCERIES LTD
+            <span>(KGL)</span>
+        </h1>
+        <p>Wholesale Cereal Distributor</p>
+        <div class="loader"></div>
+        <p>Loading system...</p>
+        <p class="note">Branches: MAGANJO | MATUGGA</p>
+    </div>
+
+    <script>
+        // ✅ FIXED: For BOTH localhost and live server
+        setTimeout(() => {
+            // Check if we're on localhost or live server
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            
+            if (isLocal) {
+                // For local development with your current setup
+                window.location.href = '/pages/login.html';
+            } else {
+                // For live server (Netlify, etc.)
+                window.location.href = '/pages/login.html';
+            }
+        }, 2000);
+        
+        console.log('📍 Index page loaded');
+        console.log('🌐 Hostname:', window.location.hostname);
+        console.log('📁 Current path:', window.location.pathname);
+    </script>
+</body>
+
+</html>

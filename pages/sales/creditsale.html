@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KGL - Credit Sale</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- ✅ FIXED: Correct path to CSS -->
+    <link rel="stylesheet" href="../../css/sales.css">
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>KARIBU GROCERIES</h2>
+            <p>Sales Agent</p>
+            <div class="branch-name" id="branchName">MAGANJO Branch</div>
+        </div>
+
+        <div class="sidebar-menu">
+            <!-- ✅ FIXED: All links use same folder -->
+            <a href="dashboard.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="newsale.html" class="menu-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>New Sale</span>
+            </a>
+            <a href="creditsale.html" class="menu-item active">
+                <i class="fas fa-credit-card"></i>
+                <span>Credit Sale</span>
+            </a>
+            <a href="history.html" class="menu-item">
+                <i class="fas fa-history"></i>
+                <span>My Sales</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="page-title">
+                <h1>Credit Sale</h1>
+                <p><i class="fas fa-store"></i> Selling on credit from: <span id="branchDisplay">MAGANJO Branch</span></p>
+            </div>
+            <div class="user-info">
+                <div class="user-badge">
+                    <i class="fas fa-user-tag"></i>
+                    <span id="userName">Loading...</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Credit Sale Form -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-credit-card"></i> Record Credit Sale</h2>
+            </div>
+            
+            <div class="form-container">
+                <div class="alert alert-warning" style="margin-bottom: 20px;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Credit sales are recorded separately. Ensure buyer is trusted.</span>
+                </div>
+                
+                <form id="creditSaleForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="buyerName">
+                                <i class="fas fa-user"></i> Buyer Name
+                            </label>
+                            <input type="text" id="buyerName" placeholder="Buyer name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="idType">
+                                <i class="fas fa-id-card"></i> ID Type
+                            </label>
+                            <select id="idType" required>
+                                <option value="NIN">National ID (NIN)</option>
+                                <option value="Refugee ID">Refugee ID</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="idNumber">
+                                <i class="fas fa-hashtag"></i> ID Number
+                            </label>
+                            <input type="text" id="idNumber" placeholder="Enter ID number" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="location">
+                                <i class="fas fa-map-marker-alt"></i> Location
+                            </label>
+                            <input type="text" id="location" placeholder="Buyer location" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contact">
+                                <i class="fas fa-phone"></i> Contact
+                            </label>
+                            <input type="text" id="contact" placeholder="+256700000000" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="produceSelect">
+                            <i class="fas fa-seedling"></i> Select Product
+                        </label>
+                        <select id="produceSelect" required>
+                            <option value="">Select Product</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quantity">
+                                <i class="fas fa-weight"></i> Quantity (kg)
+                            </label>
+                            <input type="number" id="quantity" placeholder="e.g., 100" min="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="amountDue">
+                                <i class="fas fa-money-bill"></i> Amount Due (UGX)
+                            </label>
+                            <input type="number" id="amountDue" placeholder="e.g., 500000" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dueDate">
+                                <i class="fas fa-calendar"></i> Due Date
+                            </label>
+                            <input type="date" id="dueDate" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dispatchDate">
+                                <i class="fas fa-truck"></i> Dispatch Date
+                            </label>
+                            <input type="date" id="dispatchDate" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-warning btn-block">
+                        <i class="fas fa-save"></i> Record Credit Sale
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ FIXED: JavaScript paths -->
+    <script src="../../js/api-config.js"></script>
+    <script src="../../js/utilities.js"></script>
+    <script src="../../js/sales.js"></script>
+</body>
+</html>

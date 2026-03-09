@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KGL - Manager Dashboard</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- ✅ FIXED: Correct path to CSS -->
+    <link rel="stylesheet" href="../../css/manager.css">
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>KARIBU GROCERIES</h2>
+            <p>Manager Panel</p>
+            <div class="branch-name" id="branchName">MAGANJO Branch</div>
+        </div>
+
+        <div class="sidebar-menu">
+            <a href="dashboard.html" class="menu-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="procurement.html" class="menu-item">
+                <i class="fas fa-truck-loading"></i>
+                <span>Record Procurement</span>
+            </a>
+            <a href="inventory.html" class="menu-item">
+                <i class="fas fa-boxes"></i>
+                <span>Inventory</span>
+            </a>
+            <a href="sales.html" class="menu-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Record Sale</span>
+            </a>
+            <a href="creditsales.html" class="menu-item">
+                <i class="fas fa-credit-card"></i>
+                <span>Credit Sale</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="page-title">
+                <h1>Manager Dashboard</h1>
+                <p><i class="fas fa-store"></i> Managing: <span id="branchDisplay">MAGANJO Branch</span></p>
+            </div>
+            <div class="user-info">
+                <div class="user-badge">
+                    <i class="fas fa-user-cog"></i>
+                    <span id="userName">Loading...</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Total Stock</h3>
+                    <p id="totalStock">0 kg</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Products</h3>
+                    <p id="totalProducts">0</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Today's Sales</h3>
+                    <p id="todaySales">UGX 0</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>Low Stock</h3>
+                    <p id="lowStock">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <h2 style="margin-bottom: 15px; color: var(--navy-dark);">Quick Actions</h2>
+        <div class="actions-grid">
+            <a href="procurement.html" class="action-card">
+                <i class="fas fa-truck-loading"></i>
+                <h3>Record Procurement</h3>
+                <p>Add new stock to inventory</p>
+            </a>
+            
+            <a href="sales.html" class="action-card">
+                <i class="fas fa-shopping-cart"></i>
+                <h3>Record Sale</h3>
+                <p>Sell to customers</p>
+            </a>
+            
+            <a href="creditsales.html" class="action-card">
+                <i class="fas fa-credit-card"></i>
+                <h3>Credit Sale</h3>
+                <p>Sell on credit to trusted buyers</p>
+            </a>
+        </div>
+
+        <!-- Recent Inventory -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-boxes"></i> Current Inventory</h2>
+                <a href="inventory.html" class="btn btn-primary">View All</a>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Type</th>
+                            <th>Tonnage (kg)</th>
+                            <th>Selling Price</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center;">Loading inventory...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <div class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+        
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth <= 768) {
+                if (sidebar && menuBtn && !sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+        
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) sidebar.classList.remove('active');
+            }
+        });
+    </script>
+    
+    <!-- ✅ FIXED: JavaScript paths -->
+    <script src="../../js/api-config.js"></script>
+    <script src="../../js/utilities.js"></script>
+    <script src="../../js/manager.js"></script>
+</body>
+</html>

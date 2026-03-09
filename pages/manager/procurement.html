@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KGL - Record Procurement</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- ✅ FIXED: Correct path to CSS -->
+    <link rel="stylesheet" href="../../css/manager.css">
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>KARIBU GROCERIES</h2>
+            <p>Manager Panel</p>
+            <div class="branch-name" id="branchName">MAGANJO Branch</div>
+        </div>
+
+        <div class="sidebar-menu">
+            <!-- ✅ FIXED: All links use same folder -->
+            <a href="dashboard.html" class="menu-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="procurement.html" class="menu-item active">
+                <i class="fas fa-truck-loading"></i>
+                <span>Record Procurement</span>
+            </a>
+            <a href="inventory.html" class="menu-item">
+                <i class="fas fa-boxes"></i>
+                <span>Inventory</span>
+            </a>
+            <a href="sales.html" class="menu-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Record Sale</span>
+            </a>
+            <a href="creditsales.html" class="menu-item">
+                <i class="fas fa-credit-card"></i>
+                <span>Credit Sale</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="page-title">
+                <h1>Record Procurement</h1>
+                <p><i class="fas fa-store"></i> Adding stock to: <span id="branchDisplay">MAGANJO Branch</span></p>
+            </div>
+            <div class="user-info">
+                <div class="user-badge">
+                    <i class="fas fa-user-cog"></i>
+                    <span id="userName">Loading...</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Procurement Form -->
+        <div class="section-card">
+            <div class="section-header">
+                <h2><i class="fas fa-truck-loading"></i> New Procurement</h2>
+            </div>
+            
+            <div class="form-container">
+                <form id="procurementForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="produceName">
+                                <i class="fas fa-seedling"></i> Produce Name
+                            </label>
+                            <select id="produceName" required>
+                                <option value="">Select Produce</option>
+                                <option value="Beans">Beans</option>
+                                <option value="Maize">Grain Maize</option>
+                                <option value="Cow Peas">Cow Peas</option>
+                                <option value="Groundnuts">G-nuts (Groundnuts)</option>
+                                <option value="Soybeans">Soybeans</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="produceType">
+                                <i class="fas fa-tag"></i> Type
+                            </label>
+                            <input type="text" id="produceType" placeholder="e.g., Beans" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tonnage">
+                                <i class="fas fa-weight"></i> Tonnage (kg)
+                            </label>
+                            <input type="number" id="tonnage" placeholder="e.g., 1000" min="1000" required>
+                            <small>Minimum 1000kg</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cost">
+                                <i class="fas fa-money-bill"></i> Cost (UGX)
+                            </label>
+                            <input type="number" id="cost" placeholder="e.g., 5000000" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dealerName">
+                                <i class="fas fa-user"></i> Dealer Name
+                            </label>
+                            <input type="text" id="dealerName" placeholder="Dealer name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dealerContact">
+                                <i class="fas fa-phone"></i> Dealer Contact
+                            </label>
+                            <input type="text" id="dealerContact" placeholder="+256700000000" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sellingPrice">
+                                <i class="fas fa-tag"></i> Selling Price (per kg)
+                            </label>
+                            <input type="number" id="sellingPrice" placeholder="e.g., 5000" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date">
+                                <i class="fas fa-calendar"></i> Date
+                            </label>
+                            <input type="date" id="date" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="time">
+                            <i class="fas fa-clock"></i> Time
+                        </label>
+                        <input type="time" id="time" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success btn-block">
+                        <i class="fas fa-save"></i> Record Procurement
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <div class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        }
+        
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (window.innerWidth <= 768) {
+                if (sidebar && menuBtn && !sidebar.contains(event.target) && !menuBtn.contains(event.target)) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+        
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                const sidebar = document.querySelector('.sidebar');
+                if (sidebar) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = window.location.pathname.split('/').pop();
+            const menuItems = document.querySelectorAll('.menu-item, .nav-item');
+            
+            menuItems.forEach(item => {
+                const href = item.getAttribute('href');
+                if (href && href.includes(currentPage)) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+    <!-- ✅ FIXED: JavaScript paths -->
+    <script src="../../js/api-config.js"></script>
+    <script src="../../js/utilities.js"></script>
+    <script src="../../js/manager.js"></script>
+</body>
+</html>

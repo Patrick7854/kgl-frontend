@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KGL Groceries LTD - Login</title>
+
+    <!-- Cache control - PREVENTS browser from saving form data -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/login.css">
+
+    <!-- ADD THIS: Prevent browser autofill -->
+    <style>
+        /* Hide the browser's autofill background */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px white inset !important;
+            box-shadow: 0 0 0 30px white inset !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="login-card">
+            <!-- LEFT SIDE -->
+            <div class="left-section">
+                <h1>
+                    KGL Groceries LTD
+                    <span>Wholesale Cereal Distributor</span>
+                </h1>
+                <p>From black books to digital - managing procurement, sales, credit transactions, and reporting
+                    efficiently.</p>
+
+                <div class="branch-box">
+                    <h3><i class="fas fa-store"></i> Our Branches</h3>
+                    <div class="branch-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong>Matugga Branch</strong>
+                            <p style="font-size: 13px; margin: 0;">Manager + 2 Sales Agents</p>
+                        </div>
+                    </div>
+                    <div class="branch-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong>Maganjo Branch</strong>
+                            <p style="font-size: 13px; margin: 0;">Manager + 2 Sales Agents</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="products">
+                    <h3><i class="fas fa-seedling"></i> Our Products</h3>
+                    <div class="product-tags">
+                        <span class="tag">Beans</span>
+                        <span class="tag">Grain Maize</span>
+                        <span class="tag">Cow Peas</span>
+                        <span class="tag">G-nuts</span>
+                        <span class="tag">Soybeans</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; font-size: 13px;">
+                    <p><i class="fas fa-tractor"></i> Own farms: Maganjo & Matugga</p>
+                </div>
+            </div>
+
+            <!-- RIGHT SIDE - Login Form -->
+            <div class="right-section">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your account</p>
+
+                <div id="errorContainer" class="error-message" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorText"></span>
+                </div>
+
+                <!-- ✅ FIXED: Added autocomplete="off" and new attributes -->
+                <form id="loginForm" autocomplete="off">
+                    <div class="form-group">
+                        <label for="email">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="email" id="email" name="email" placeholder="Enter your email" required
+                                autocomplete="off" readonly onfocus="this.removeAttribute('readonly')">
+                        </div>
+                        <span class="validation-message" id="emailError"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" name="password" placeholder="Enter your password"
+                                required autocomplete="off" readonly onfocus="this.removeAttribute('readonly')">
+                            <button type="button" class="toggle-password" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <span class="validation-message" id="passwordError"></span>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-link">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="login-btn" id="loginBtn">
+                        Sign In
+                    </button>
+                </form>
+
+                <!-- Test Credentials (for reference only) -->
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--gray-medium);">
+                    <p style="text-align: center; color: var(--gray-dark); font-size: 13px; margin-bottom: 10px;">
+                        <i class="fas fa-info-circle"></i> Test Credentials
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; font-size: 12px;">
+                        <span style="background: var(--gray-light); padding: 5px 10px; border-radius: 20px;">Director:
+                            director@karibugroceries.com</span>
+                        <span style="background: var(--gray-light); padding: 5px 10px; border-radius: 20px;">Manager
+                            (Matugga): manager.matugga@karibugroceries.com</span>
+                        <span style="background: var(--gray-light); padding: 5px 10px; border-radius: 20px;">Manager
+                            (Maganjo): manager.maganjo@karibugroceries.com</span>
+                    </div>
+                    <p style="text-align: center; color: var(--gray-dark); font-size: 12px; margin-top: 10px;">
+                        All passwords: <strong>password123</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>KGL Groceries LTD</h3>
+                <p>Wholesale produce distributor dealing in cereals. Two branches: Matugga and Maganjo.</p>
+                <div class="branch-address">
+                    <p><i class="fas fa-map-pin"></i> Matugga: Industrial Area</p>
+                    <p><i class="fas fa-map-pin"></i> Maganjo: Main Street</p>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul class="contact-info">
+                    <li><i class="fas fa-phone"></i> Matugga: +256 700 123456</li>
+                    <li><i class="fas fa-phone"></i> Maganjo: +256 700 123457</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>© 2026 KGL Groceries LTD. Student Project</div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="../js/api-config.js"></script>
+    <script src="../js/utilities.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <!-- ✅ ADD THIS: Extra JavaScript to clear fields -->
+    <script>
+        // Force clear fields when page loads
+        window.onload = function () {
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            console.log('🧹 Login fields cleared on page load');
+        };
+
+        // Also clear when page is shown (for back button)
+        window.addEventListener('pageshow', function (event) {
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            console.log('🧹 Login fields cleared on page show');
+        });
+
+        console.log('📍 Login page loaded - fields will be empty');
+        console.log('Current location:', window.location.pathname);
+    </script>
+</body>
+
+</html>
