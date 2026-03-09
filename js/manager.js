@@ -1,8 +1,7 @@
 /**
  * KARIBU GROCERIES LTD (KGL) - Manager Dashboard
  * Branches: MAGANJO and MATUGGA
- * Manager can: Add stock, record sales, credit sales, view inventory
- * FULLY FIXED - Procurement and Today's Sales now work!
+ * UNIVERSAL FIX - Dashboard updates for all branches
  */
 
 // ========================================
@@ -18,19 +17,14 @@ let produceList = [];
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('📊 Manager Dashboard loaded');
     
-    // Check if user is logged in
     if (!APIService.isAuthenticated()) {
-        console.log('❌ Not authenticated, redirecting');
         window.location.href = '/frontend/pages/login.html';
         return;
     }
     
-    // Get current user
     currentUser = APIService.getCurrentUser();
     
-    // Verify user is Manager
     if (currentUser.role !== 'Manager') {
-        console.log('❌ Access denied');
         alert('Access denied. Manager only.');
         APIService.redirectToDashboard(currentUser.role);
         return;
@@ -40,37 +34,28 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('✅ Authenticated as:', currentUser.name);
     console.log('🏢 Branch:', currentBranch);
     
-    // Update UI with user info
     updateUserInfo();
-    
-    // Load produce for this branch
     await loadProduce();
-    
-    // Load today's sales
     await loadTodaysSales();
-    
-    // Setup page based on which page we're on
     setupPage();
     
-    // Auto-refresh every 10 seconds
+    // Auto-refresh every 30 seconds
     setInterval(async () => {
         console.log('🔄 Auto-refreshing inventory...');
         await loadProduce();
         await loadTodaysSales();
-    }, 10000);
+    }, 30000);
 });
 
 // ========================================
 // UPDATE USER INFO
 // ========================================
 function updateUserInfo() {
-    const userNameElements = document.querySelectorAll('#userName');
-    userNameElements.forEach(el => {
+    document.querySelectorAll('#userName').forEach(el => {
         if (el) el.textContent = currentUser.name;
     });
     
-    const branchElements = document.querySelectorAll('#branchName, #branchDisplay');
-    branchElements.forEach(el => {
+    document.querySelectorAll('#branchName, #branchDisplay').forEach(el => {
         if (el) el.textContent = currentBranch + ' Branch';
     });
 }
@@ -83,7 +68,6 @@ async function loadTodaysSales() {
         const token = localStorage.getItem('kgl_token');
         if (!token) return;
         
-        console.log('💰 Fetching today\'s sales...');
         const response = await APIService.getSales(token, true);
         
         if (response?.success) {
@@ -109,20 +93,18 @@ async function loadProduce() {
             return;
         }
         
-        console.log('🔍 Fetching produce for branch:', currentBranch);
+        console.log(`🔍 Fetching produce for ${currentBranch} branch...`);
         showLoadingInAllTables();
         
         const response = await APIService.getProduce(currentBranch, token);
-        console.log('📥 Load produce response:', response);
         
         if (response?.success) {
             produceList = response.produce || [];
-            console.log(`✅ Loaded ${produceList.length} produce items`);
+            console.log(`✅ Loaded ${produceList.length} items for ${currentBranch}`);
             
-            updateInventoryDisplay();
-            updateDashboardStats();
-            updateAllDropdowns();
-            checkLowStock();
+            // Force update ALL displays
+            forceUpdateAllDisplays();
+            
         } else {
             produceList = [];
             showEmptyState();
@@ -135,14 +117,38 @@ async function loadProduce() {
 }
 
 // ========================================
+// FORCE UPDATE ALL DISPLAYS
+// ========================================
+function forceUpdateAllDisplays() {
+    console.log('🔄 Force updating all displays...');
+    
+    // Update inventory table if it exists
+    updateInventoryDisplay();
+    
+    // Update dashboard stats
+    updateDashboardStats();
+    
+    // Update all dropdowns
+    updateAllDropdowns();
+    
+    // Check low stock
+    checkLowStock();
+    
+    // Force dashboard table to refresh
+    const inventoryBody = document.getElementById('inventoryTableBody');
+    if (inventoryBody && produceList.length > 0) {
+        console.log(`📊 Dashboard table updated with ${produceList.length} items`);
+    }
+}
+
+// ========================================
 // SHOW LOADING IN ALL TABLES
 // ========================================
 function showLoadingInAllTables() {
-    const tables = ['inventoryTableBody', 'recentInventoryBody', 'stockBody'];
-    tables.forEach(tableId => {
+    ['inventoryTableBody', 'recentInventoryBody', 'stockBody'].forEach(tableId => {
         const table = document.getElementById(tableId);
         if (table) {
-            table.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px;"><i class="fas fa-spinner fa-spin" style="font-size: 30px; color: var(--gold-primary);"></i><p style="margin-top: 10px;">Loading inventory...</p></td></tr>`;
+            table.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 30px;"><i class="fas fa-spinner fa-spin" style="font-size: 30px;"></i><p>Loading inventory...</p></td></tr>`;
         }
     });
 }
@@ -153,7 +159,7 @@ function showLoadingInAllTables() {
 function showEmptyState() {
     const inventoryBody = document.getElementById('inventoryTableBody');
     if (inventoryBody) {
-        inventoryBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;"><i class="fas fa-box-open" style="font-size: 40px; color: #ccc;"></i><p style="margin-top: 10px;">No inventory found. Add some stock!</p></td></tr>`;
+        inventoryBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;"><i class="fas fa-box-open" style="font-size: 40px; color: #ccc;"></i><p>No inventory found. Add some stock!</p></td></tr>`;
     }
 }
 
@@ -163,7 +169,7 @@ function showEmptyState() {
 function showErrorState() {
     const inventoryBody = document.getElementById('inventoryTableBody');
     if (inventoryBody) {
-        inventoryBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;"><i class="fas fa-exclamation-circle" style="font-size: 40px; color: var(--danger);"></i><p style="margin-top: 10px;">Error loading inventory</p></td></tr>`;
+        inventoryBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;"><i class="fas fa-exclamation-circle" style="font-size: 40px; color: var(--danger);"></i><p>Error loading inventory</p></td></tr>`;
     }
 }
 
@@ -171,8 +177,7 @@ function showErrorState() {
 // UPDATE ALL DROPDOWNS
 // ========================================
 function updateAllDropdowns() {
-    const dropdowns = ['produceSelect', 'productSelect', 'itemSelect'];
-    dropdowns.forEach(id => {
+    ['produceSelect', 'productSelect', 'itemSelect'].forEach(id => {
         const select = document.getElementById(id);
         if (select) updateProduceDropdown(select);
     });
@@ -188,6 +193,7 @@ function updateDashboardStats() {
     
     if (totalStockEl || totalProductsEl || lowStockEl) {
         let totalKg = 0, lowStockCount = 0;
+        
         produceList.forEach(item => {
             totalKg += item.tonnage || 0;
             if (item.tonnage < 1000 && item.tonnage > 0) lowStockCount++;
@@ -221,94 +227,86 @@ function checkLowStock() {
 }
 
 // ========================================
-// UPDATE INVENTORY DISPLAY - DEBUG VERSION
+// UPDATE INVENTORY DISPLAY - FORCED UPDATE
 // ========================================
 function updateInventoryDisplay() {
-    console.log('📊 UPDATE INVENTORY DISPLAY CALLED');
-    console.log('📍 Current page:', window.location.pathname);
-    console.log('📦 produceList length:', produceList.length);
+    console.log('📊 Updating inventory display...');
     
     const inventoryBody = document.getElementById('inventoryTableBody');
-    console.log('🔍 inventoryBody exists:', !!inventoryBody);
-    
-    if (inventoryBody) {
-        if (produceList.length === 0) {
-            console.log('📭 Showing empty state');
-            inventoryBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;"><i class="fas fa-box-open" style="font-size: 40px; color: #ccc;"></i><p style="margin-top: 10px;">No inventory found. Add some stock!</p></td></tr>`;
-        } else {
-            console.log(`📊 Generating HTML for ${produceList.length} items`);
-            let html = '', totalStock = 0, lowStockCount = 0;
-            
-            [...produceList].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).forEach((item, index) => {
-                console.log(`   Item ${index + 1}:`, item.name, item.tonnage, 'kg');
-                totalStock += item.tonnage || 0;
-                
-                let statusClass = 'in-stock', statusText = 'In Stock';
-                if (item.tonnage <= 0) {
-                    statusClass = 'out-stock'; statusText = 'Out of Stock';
-                } else if (item.tonnage < 1000) {
-                    statusClass = 'low-stock'; statusText = 'Low Stock'; lowStockCount++;
-                }
-                
-                html += `<tr data-produce-id="${item._id || item.id}"><td>${item.name}</td><td>${item.type || item.name}</td><td>${item.tonnage.toLocaleString()} kg</td><td class="price-cell">UGX ${item.sellingPrice?.toLocaleString() || '0'}</td><td><span class="status-badge ${statusClass}">${statusText}</span></td><td>${item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Today'}</td><td><button class="action-btn edit-price" title="Edit Price" onclick="editPrice('${item._id || item.id}', ${item.sellingPrice || 0}, this.closest('tr'))"><i class="fas fa-edit"></i></button></td></tr>`;
-            });
-            
-            inventoryBody.innerHTML = html;
-            
-            const totalStockEl = document.getElementById('totalStock');
-            const totalProductsEl = document.getElementById('totalProducts');
-            const lowStockEl = document.getElementById('lowStock');
-            
-            if (totalStockEl) totalStockEl.textContent = totalStock.toLocaleString() + ' kg';
-            if (totalProductsEl) totalProductsEl.textContent = produceList.length;
-            if (lowStockEl) lowStockEl.textContent = lowStockCount;
-        }
-    } else {
-        console.log('❌ inventoryTableBody not found - are you on the right page?');
+    if (!inventoryBody) {
+        console.log('ℹ️ No inventory table on this page');
+        return;
     }
+    
+    if (produceList.length === 0) {
+        inventoryBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;"><i class="fas fa-box-open" style="font-size: 40px; color: #ccc;"></i><p>No inventory found. Add some stock!</p></td></tr>`;
+        return;
+    }
+    
+    let html = '', totalStock = 0, lowStockCount = 0;
+    
+    [...produceList].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).forEach(item => {
+        totalStock += item.tonnage || 0;
+        
+        let statusClass = 'in-stock', statusText = 'In Stock';
+        if (item.tonnage <= 0) {
+            statusClass = 'out-stock'; statusText = 'Out of Stock';
+        } else if (item.tonnage < 1000) {
+            statusClass = 'low-stock'; statusText = 'Low Stock'; lowStockCount++;
+        }
+        
+        html += `<tr data-produce-id="${item._id || item.id}">
+            <td>${item.name}</td>
+            <td>${item.type || item.name}</td>
+            <td>${item.tonnage.toLocaleString()} kg</td>
+            <td class="price-cell">UGX ${item.sellingPrice?.toLocaleString() || '0'}</td>
+            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+            <td>${item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Today'}</td>
+            <td><button class="action-btn edit-price" onclick="editPrice('${item._id || item.id}', ${item.sellingPrice || 0}, this.closest('tr'))"><i class="fas fa-edit"></i></button></td>
+        </tr>`;
+    });
+    
+    inventoryBody.innerHTML = html;
+    
+    // Update stats after table update
+    const totalStockEl = document.getElementById('totalStock');
+    const totalProductsEl = document.getElementById('totalProducts');
+    const lowStockEl = document.getElementById('lowStock');
+    
+    if (totalStockEl) totalStockEl.textContent = totalStock.toLocaleString() + ' kg';
+    if (totalProductsEl) totalProductsEl.textContent = produceList.length;
+    if (lowStockEl) lowStockEl.textContent = lowStockCount;
+    
+    console.log(`✅ Display updated with ${produceList.length} items`);
 }
 
 // ========================================
-// UPDATE PRODUCE DROPDOWN - ADD DEBUG
+// UPDATE PRODUCE DROPDOWN
 // ========================================
 function updateProduceDropdown(produceSelect) {
-    console.log('🔄 updateProduceDropdown called');
-    if (!produceSelect) {
-        console.log('❌ produceSelect is null');
-        return;
-    }
+    if (!produceSelect) return;
     
-    console.log('📦 produceList length:', produceList.length);
     produceSelect.innerHTML = '<option value="">Select Produce</option>';
     
-    if (produceList.length === 0) {
-        console.log('⚠️ No produce items to display');
-        return;
-    }
+    if (produceList.length === 0) return;
     
-    let optionCount = 0;
     produceList.forEach(item => {
         if (item.tonnage > 0) {
             const option = document.createElement('option');
             option.value = item.name;
-            option.textContent = `${item.name} - ${item.tonnage}kg available @ UGX ${item.sellingPrice}/kg`;
+            option.textContent = `${item.name} - ${item.tonnage}kg @ UGX ${item.sellingPrice}/kg`;
             option.setAttribute('data-price', item.sellingPrice);
             option.setAttribute('data-max', item.tonnage);
             produceSelect.appendChild(option);
-            optionCount++;
-            console.log(`   ✅ Added option: ${item.name} (${item.tonnage}kg)`);
         }
     });
-    
-    console.log(`📋 Total options added: ${optionCount}`);
 }
 
 // ========================================
-// SETUP PAGE BASED ON CURRENT PAGE
+// SETUP PAGE
 // ========================================
 function setupPage() {
     const path = window.location.pathname;
-    console.log('🔧 Setting up page for path:', path);
     
     if (path.includes('procurement.html')) {
         setupProcurementPage();
@@ -319,52 +317,123 @@ function setupPage() {
     } else if (path.includes('inventory.html')) {
         setupInventoryPage();
     } else if (path.includes('dashboard.html')) {
-        updateInventoryDisplay();
-        updateDashboardStats();
+        forceUpdateAllDisplays();
     }
 }
 
 // ========================================
-// SALES PAGE - FIXED VERSION (ONLY ONE!)
+// PROCUREMENT PAGE - FIXED
+// ========================================
+function setupProcurementPage() {
+    console.log('📝 Setting up procurement page');
+    const form = document.getElementById('procurementForm');
+    if (!form) return;
+    
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('date');
+    const timeInput = document.getElementById('time');
+    
+    if (dateInput) dateInput.value = today;
+    if (timeInput) {
+        const now = new Date();
+        timeInput.value = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    }
+    
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+    
+    newForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const produceData = {
+            name: document.getElementById('produceName')?.value,
+            type: document.getElementById('produceType')?.value,
+            tonnage: parseInt(document.getElementById('tonnage')?.value),
+            cost: parseInt(document.getElementById('cost')?.value),
+            dealerName: document.getElementById('dealerName')?.value,
+            dealerContact: document.getElementById('dealerContact')?.value,
+            sellingPrice: parseInt(document.getElementById('sellingPrice')?.value),
+            branch: currentBranch,
+            date: document.getElementById('date')?.value,
+            time: document.getElementById('time')?.value
+        };
+        
+        // Validate
+        for (let [key, value] of Object.entries(produceData)) {
+            if (!value && value !== 0) {
+                alert(`❌ Please fill in ${key}`);
+                return;
+            }
+        }
+        
+        if (produceData.tonnage < 1000) {
+            alert('❌ Minimum 1000kg required');
+            return;
+        }
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        try {
+            const token = localStorage.getItem('kgl_token');
+            if (!token) {
+                alert('Session expired');
+                return;
+            }
+            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            submitBtn.disabled = true;
+            
+            const response = await APIService.createProduce(produceData, token);
+            
+            if (response?.success) {
+                alert('✅ Procurement recorded!');
+                e.target.reset();
+                if (dateInput) dateInput.value = today;
+                
+                // CRITICAL: Force reload of produce and update ALL displays
+                await loadProduce();
+                
+                // If we're on dashboard, ensure it updates
+                if (window.location.pathname.includes('dashboard.html')) {
+                    forceUpdateAllDisplays();
+                }
+                
+                console.log('✅ Procurement added and displays updated');
+            } else {
+                alert('❌ Error: ' + (response?.message || 'Failed'));
+            }
+        } catch (error) {
+            console.log('❌ Error:', error);
+            alert('Error recording procurement');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+}
+
+// ========================================
+// SALES PAGE
 // ========================================
 function setupSalesPage() {
-    console.log('💰 Setting up sales page');
-    console.log('📦 Current produceList length:', produceList.length);
-    
     const produceSelect = document.getElementById('produceSelect');
     const form = document.getElementById('saleForm');
+    if (!produceSelect || !form) return;
     
-    if (!produceSelect) {
-        console.log('❌ produceSelect not found');
-        return;
-    }
-    if (!form) {
-        console.log('❌ saleForm not found');
-        return;
-    }
-    
-    console.log('🔄 Updating produce dropdown...');
     updateProduceDropdown(produceSelect);
-    console.log('📋 Dropdown options count:', produceSelect.options.length);
     
     document.getElementById('quantity').addEventListener('input', function() {
-        const selectedOption = produceSelect.options[produceSelect.selectedIndex];
-        const price = selectedOption?.getAttribute('data-price') || 0;
-        const quantity = parseInt(this.value) || 0;
-        document.getElementById('amountPaid').value = price * quantity;
+        const opt = produceSelect.options[produceSelect.selectedIndex];
+        const price = opt?.getAttribute('data-price') || 0;
+        document.getElementById('amountPaid').value = price * (parseInt(this.value) || 0);
     });
     
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const selectedOption = produceSelect.options[produceSelect.selectedIndex];
-        if (!selectedOption || selectedOption.value === '') {
-            alert('Please select a product');
-            return;
-        }
-        
-        const quantity = parseInt(document.getElementById('quantity').value);
         const produce = produceList.find(p => p.name === produceSelect.value);
+        const quantity = parseInt(document.getElementById('quantity').value);
         
         if (!produce || produce.tonnage < quantity) {
             alert('Insufficient stock!');
@@ -381,98 +450,77 @@ function setupSalesPage() {
             dateTime: new Date().toISOString()
         };
         
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
         
         try {
             const token = localStorage.getItem('kgl_token');
             if (!token) {
-                alert('Session expired. Please login again.');
+                alert('Session expired');
                 return;
             }
             
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            submitBtn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
             
             const response = await APIService.createSale(saleData, token);
             
             if (response.success) {
-                alert('✅ Sale recorded successfully!');
+                alert('✅ Sale recorded!');
                 form.reset();
                 await loadProduce();
                 await loadTodaysSales();
                 updateProduceDropdown(produceSelect);
             } else {
-                alert('❌ Error: ' + (response.message || 'Failed to record sale'));
+                alert('❌ Error: ' + (response.message || 'Failed'));
             }
         } catch (error) {
             console.log('❌ Error:', error);
             alert('Error recording sale');
         } finally {
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
     });
-    
-    console.log('✅ Sales page setup complete');
 }
 
 // ========================================
-// CREDIT SALES PAGE - FIXED VERSION
+// CREDIT SALES PAGE
 // ========================================
 function setupCreditSalesPage() {
-    console.log('💳 Setting up credit sales page');
-    console.log('📦 Current produceList length:', produceList.length);
-    
     const produceSelect = document.getElementById('produceSelect');
     const form = document.getElementById('creditSaleForm');
-    
-    if (!produceSelect) {
-        console.log('❌ produceSelect not found');
-        return;
-    }
-    if (!form) {
-        console.log('❌ creditSaleForm not found');
-        return;
-    }
+    if (!produceSelect || !form) return;
     
     const today = new Date().toISOString().split('T')[0];
     const dispatchDateEl = document.getElementById('dispatchDate');
     const dueDateEl = document.getElementById('dueDate');
     
     if (dispatchDateEl) dispatchDateEl.value = today;
+    if (dueDateEl) {
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        dueDateEl.value = nextMonth.toISOString().split('T')[0];
+    }
     
-    const nextMonth = new Date();
-    nextMonth.setMonth(nextMonth.getMonth() + 1);
-    if (dueDateEl) dueDateEl.value = nextMonth.toISOString().split('T')[0];
-    
-    console.log('🔄 Updating credit sales dropdown...');
     updateProduceDropdown(produceSelect);
-    console.log('📋 Credit dropdown options:', produceSelect.options.length);
     
     const quantityEl = document.getElementById('quantity');
     const amountDueEl = document.getElementById('amountDue');
     
     if (quantityEl && amountDueEl) {
         quantityEl.addEventListener('input', function() {
-            const selectedOption = produceSelect.options[produceSelect.selectedIndex];
-            const price = selectedOption?.getAttribute('data-price') || 0;
-            const quantity = parseInt(this.value) || 0;
-            amountDueEl.value = price * quantity;
+            const opt = produceSelect.options[produceSelect.selectedIndex];
+            const price = opt?.getAttribute('data-price') || 0;
+            amountDueEl.value = price * (parseInt(this.value) || 0);
         });
     }
     
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const selectedOption = produceSelect.options[produceSelect.selectedIndex];
-        if (!selectedOption || selectedOption.value === '') {
-            alert('Please select a product');
-            return;
-        }
-        
-        const quantity = parseInt(document.getElementById('quantity').value);
         const produce = produceList.find(p => p.name === produceSelect.value);
+        const quantity = parseInt(document.getElementById('quantity').value);
         
         if (!produce || produce.tonnage < quantity) {
             alert('Insufficient stock!');
@@ -481,8 +529,8 @@ function setupCreditSalesPage() {
         
         const creditData = {
             buyerName: document.getElementById('buyerName').value,
-            idType: document.getElementById('idType').value,
-            idNumber: document.getElementById('idNumber').value,
+            idType: document.getElementById('idType')?.value || 'NIN',
+            idNumber: document.getElementById('idNumber')?.value || '',
             location: document.getElementById('location').value,
             contact: document.getElementById('contact').value,
             amountDue: parseInt(document.getElementById('amountDue').value),
@@ -495,142 +543,56 @@ function setupCreditSalesPage() {
             status: 'Pending'
         };
         
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
         
         try {
             const token = localStorage.getItem('kgl_token');
             if (!token) {
-                alert('Session expired. Please login again.');
+                alert('Session expired');
                 return;
             }
             
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-            submitBtn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
             
             const response = await APIService.createCreditSale(creditData, token);
             
             if (response.success) {
-                alert('✅ Credit sale recorded successfully!');
+                alert('✅ Credit sale recorded!');
                 form.reset();
-                
                 if (dispatchDateEl) dispatchDateEl.value = today;
-                if (dueDateEl) dueDateEl.value = nextMonth.toISOString().split('T')[0];
-                
+                if (dueDateEl) {
+                    const nextMonth = new Date();
+                    nextMonth.setMonth(nextMonth.getMonth() + 1);
+                    dueDateEl.value = nextMonth.toISOString().split('T')[0];
+                }
                 await loadProduce();
                 await loadTodaysSales();
                 updateProduceDropdown(produceSelect);
             } else {
-                alert('❌ Error: ' + (response.message || 'Failed to record credit sale'));
+                alert('❌ Error: ' + (response.message || 'Failed'));
             }
         } catch (error) {
             console.log('❌ Error:', error);
             alert('Error recording credit sale');
         } finally {
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
     });
-    
-    console.log('✅ Credit sales page setup complete');
 }
 
 // ========================================
-// PROCUREMENT PAGE
+// INVENTORY PAGE
 // ========================================
-function setupProcurementPage() {
-    console.log('📝 Setting up procurement page');
-    const form = document.getElementById('procurementForm');
-    if (!form) {
-        console.log('❌ Procurement form not found');
-        return;
-    }
-    
-    const today = new Date().toISOString().split('T')[0];
-    const dateInput = document.getElementById('date');
-    const timeInput = document.getElementById('time');
-    
-    if (dateInput) dateInput.value = today;
-    
-    const now = new Date();
-    const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-    if (timeInput) timeInput.value = time;
-    
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-    
-    newForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        console.log('📝 Form submitted');
-        
-        const produceData = {
-            name: document.getElementById('produceName')?.value,
-            type: document.getElementById('produceType')?.value,
-            tonnage: parseInt(document.getElementById('tonnage')?.value),
-            cost: parseInt(document.getElementById('cost')?.value),
-            dealerName: document.getElementById('dealerName')?.value,
-            dealerContact: document.getElementById('dealerContact')?.value,
-            sellingPrice: parseInt(document.getElementById('sellingPrice')?.value),
-            branch: currentBranch,
-            date: document.getElementById('date')?.value,
-            time: document.getElementById('time')?.value
-        };
-        
-        console.log('📝 Submitting procurement:', produceData);
-        
-        for (let [key, value] of Object.entries(produceData)) {
-            if (!value && value !== 0) {
-                alert(`❌ Please fill in ${key}`);
-                return;
-            }
-        }
-        
-        if (produceData.tonnage < 1000) {
-            alert('❌ Tonnage must be at least 1000kg for procurement');
-            return;
-        }
-        
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        
-        try {
-            const token = localStorage.getItem('kgl_token');
-            if (!token) {
-                alert('Session expired. Please login again.');
-                window.location.href = '/frontend/pages/login.html';
-                return;
-            }
-            
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-            submitBtn.disabled = true;
-            
-            const response = await APIService.createProduce(produceData, token);
-            console.log('📥 Server Response:', response);
-            
-            if (response?.success) {
-                alert('✅ Procurement recorded successfully!');
-                e.target.reset();
-                if (dateInput) dateInput.value = today;
-                if (timeInput) timeInput.value = time;
-                await loadProduce();
-                console.log('✅ Procurement saved and inventory updated');
-            } else {
-                alert('❌ Error: ' + (response?.message || 'Failed to record procurement'));
-            }
-        } catch (error) {
-            console.log('❌ Error:', error);
-            alert('❌ Error recording procurement. Check console for details.');
-        } finally {
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-        }
-    });
-    
-    console.log('✅ Procurement page setup complete');
+function setupInventoryPage() {
+    updateInventoryDisplay();
+    checkLowStock();
 }
 
 // ========================================
-// EDIT SELLING PRICE
+// EDIT PRICE FUNCTIONS
 // ========================================
 function editPrice(produceId, currentPrice, row) {
     const newPrice = prompt("Enter new selling price (UGX per kg):", currentPrice);
@@ -638,7 +600,7 @@ function editPrice(produceId, currentPrice, row) {
     
     const priceValue = parseInt(newPrice);
     if (isNaN(priceValue) || priceValue <= 0) {
-        alert('❌ Please enter a valid positive number');
+        alert('❌ Enter a valid positive number');
         return;
     }
     
@@ -646,14 +608,11 @@ function editPrice(produceId, currentPrice, row) {
     updateProducePrice(produceId, priceValue, row);
 }
 
-// ========================================
-// UPDATE PRODUCE PRICE VIA API
-// ========================================
 async function updateProducePrice(produceId, newPrice, row) {
     try {
         const token = localStorage.getItem('kgl_token');
         if (!token) {
-            alert('Session expired. Please login again.');
+            alert('Session expired');
             return;
         }
         
@@ -667,24 +626,16 @@ async function updateProducePrice(produceId, newPrice, row) {
             const index = produceList.findIndex(p => p._id === produceId || p.id === produceId);
             if (index !== -1) produceList[index].sellingPrice = newPrice;
             
-            alert('✅ Price updated successfully!');
+            alert('✅ Price updated!');
         } else {
-            alert('❌ Error: ' + (response.message || 'Failed to update price'));
+            alert('❌ Error: ' + (response.message || 'Failed'));
         }
     } catch (error) {
-        console.log('❌ Error updating price:', error);
+        console.log('❌ Error:', error);
         alert('Error updating price');
     } finally {
         row.style.opacity = '1';
     }
-}
-
-// ========================================
-// INVENTORY PAGE
-// ========================================
-function setupInventoryPage() {
-    updateInventoryDisplay();
-    checkLowStock();
 }
 
 // ========================================
@@ -697,11 +648,4 @@ if (logoutBtn) {
     });
 }
 
-// ========================================
-// ADD PULSE ANIMATION CSS
-// ========================================
-const style = document.createElement('style');
-style.textContent = `@keyframes pulse {0% { transform: scale(1); }50% { transform: scale(1.05); background-color: var(--gold-light); }100% { transform: scale(1); }}`;
-document.head.appendChild(style);
-
-console.log('🚀 Manager.js loaded - DEBUG VERSION ACTIVE!');
+console.log('🚀 Manager.js loaded - UNIVERSAL FIX for all branches');
