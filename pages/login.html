@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KGL Groceries LTD - Login</title>
 
-    <!-- Cache control - PREVENTS browser from saving form data -->
+    <!-- Cache control -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -14,12 +14,10 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="../css/login.css">
+    <!-- CSS - USING ABSOLUTE PATHS -->
+    <link rel="stylesheet" href="/css/login.css">
 
-    <!-- ADD THIS: Prevent browser autofill -->
     <style>
-        /* Hide the browser's autofill background */
         input:-webkit-autofill,
         input:-webkit-autofill:hover,
         input:-webkit-autofill:focus,
@@ -33,14 +31,13 @@
 <body>
     <div class="container">
         <div class="login-card">
-            <!-- LEFT SIDE -->
+            <!-- LEFT SIDE (same as before) -->
             <div class="left-section">
                 <h1>
                     KGL Groceries LTD
                     <span>Wholesale Cereal Distributor</span>
                 </h1>
-                <p>From black books to digital - managing procurement, sales, credit transactions, and reporting
-                    efficiently.</p>
+                <p>From black books to digital - managing procurement, sales, credit transactions, and reporting efficiently.</p>
 
                 <div class="branch-box">
                     <h3><i class="fas fa-store"></i> Our Branches</h3>
@@ -86,7 +83,6 @@
                     <span id="errorText"></span>
                 </div>
 
-                <!-- ✅ FIXED: Added autocomplete="off" and new attributes -->
                 <form id="loginForm" autocomplete="off">
                     <div class="form-group">
                         <label for="email">
@@ -126,7 +122,7 @@
                     </button>
                 </form>
 
-                <!-- Test Credentials (for reference only) -->
+                <!-- Test Credentials -->
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--gray-medium);">
                     <p style="text-align: center; color: var(--gray-dark); font-size: 13px; margin-bottom: 10px;">
                         <i class="fas fa-info-circle"></i> Test Credentials
@@ -171,29 +167,27 @@
         </div>
     </footer>
 
-    <!-- JavaScript -->
-    <script src="../js/api-config.js"></script>
-    <script src="../js/utilities.js"></script>
-    <script src="../js/auth.js"></script>
+    <!-- JavaScript - USING ABSOLUTE PATHS -->
+    <script src="/js/api-config.js"></script>
+    <script src="/js/utilities.js"></script>
+    <script src="/js/auth.js"></script>
 
-    <!-- ✅ ADD THIS: Extra JavaScript to clear fields -->
     <script>
         // Force clear fields when page loads
-        window.onload = function () {
+        window.onload = function() {
             document.getElementById('email').value = '';
             document.getElementById('password').value = '';
             console.log('🧹 Login fields cleared on page load');
+            console.log('📍 Current location:', window.location.pathname);
+            console.log('🔍 CSS path: /css/login.css');
+            console.log('🔍 JS paths: /js/api-config.js, /js/utilities.js, /js/auth.js');
         };
 
-        // Also clear when page is shown (for back button)
-        window.addEventListener('pageshow', function (event) {
+        window.addEventListener('pageshow', function(event) {
             document.getElementById('email').value = '';
             document.getElementById('password').value = '';
             console.log('🧹 Login fields cleared on page show');
         });
-
-        console.log('📍 Login page loaded - fields will be empty');
-        console.log('Current location:', window.location.pathname);
     </script>
 </body>
 

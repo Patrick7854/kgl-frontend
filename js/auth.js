@@ -223,7 +223,7 @@ async function attemptLogin() {
 }
 
 // ========================================
-// REDIRECT BASED ON ROLE - FIXED VERSION
+// REDIRECT BASED ON ROLE
 // ========================================
 function redirectToDashboard(role) {
     console.log('➡️ Redirecting to:', role, 'dashboard');
@@ -262,45 +262,45 @@ window.addEventListener('pageshow', function(event) {
     }
 });
 
-console.log('🚀 Auth.js loaded - FIXED VERSION');
+// ========================================
+// FIXED LOGOUT FUNCTION - SINGLE VERSION
+// ========================================
+function logout() {
+    console.log('🚪 Logging out...');
+    localStorage.removeItem('kgl_user');
+    localStorage.removeItem('kgl_token');
+    localStorage.removeItem('remembered_email');
+    
+    // Use absolute path from root
+    window.location.href = '/pages/login.html';
+}
 
 // ========================================
 // OVERRIDE APIService LOGOUT FUNCTIONS
 // ========================================
 // This ensures logout always goes to the right place
-
-// Fix MockAPIService logout if it exists
-if (typeof MockAPIService !== 'undefined' && MockAPIService.logout) {
-    MockAPIService.logout = function() {
-        localStorage.removeItem('kgl_user');
-        localStorage.removeItem('kgl_token');
-        localStorage.removeItem('remembered_email');
-        // Use relative path that works on Netlify
-        window.location.href = '/pages/login.html';
+if (typeof window.APIService !== 'undefined') {
+    const originalLogout = APIService.logout;
+    APIService.logout = function() {
+        logout();
     };
 }
 
-// Fix RealAPIService logout if it exists
-if (typeof RealAPIService !== 'undefined' && RealAPIService.logout) {
-    RealAPIService.logout = function() {
-        localStorage.removeItem('kgl_user');
-        localStorage.removeItem('kgl_token');
-        localStorage.removeItem('remembered_email');
-        // Use relative path that works on Netlify
-        window.location.href = '/pages/login.html';
-    };
-}
-
-// Also fix the logout button event listener
+// ========================================
+// ATTACH LOGOUT TO BUTTONS WHEN DOM IS READY
+// ========================================
 document.addEventListener('DOMContentLoaded', function() {
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function(e) {
+    // Find all logout buttons (there might be multiple)
+    const logoutBtns = document.querySelectorAll('.logout-btn, #logoutBtn');
+    
+    logoutBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
             e.preventDefault();
-            localStorage.removeItem('kgl_user');
-            localStorage.removeItem('kgl_token');
-            localStorage.removeItem('remembered_email');
-            window.location.href = '/pages/login.html';
+            logout();
         });
-    }
+    });
+    
+    console.log('🔌 Logout handlers attached to', logoutBtns.length, 'buttons');
 });
+
+console.log('🚀 Auth.js loaded - FIXED VERSION with proper logout');
