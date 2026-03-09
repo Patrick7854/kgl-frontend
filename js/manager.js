@@ -78,7 +78,7 @@ function updateUserInfo() {
 }
 
 // ========================================
-// LOAD TODAY'S SALES - NEW FUNCTION!
+// LOAD TODAY'S SALES
 // ========================================
 async function loadTodaysSales() {
     try {
@@ -91,18 +91,15 @@ async function loadTodaysSales() {
         
         console.log('💰 Fetching today\'s sales...');
         
-        // Get today's sales from API (pass true for today only)
         const response = await APIService.getSales(token, true);
         
         let todaySalesAmount = 0;
         
         if (response && response.success) {
-            // Calculate total for today
             todaySalesAmount = response.sales.reduce((sum, sale) => sum + (sale.amountPaid || 0), 0);
             console.log(`💰 Today's sales total: UGX ${todaySalesAmount}`);
         }
         
-        // Update the today's sales display
         const todaySalesEl = document.getElementById('todaySales');
         if (todaySalesEl) {
             todaySalesEl.textContent = 'UGX ' + todaySalesAmount.toLocaleString();
@@ -118,7 +115,6 @@ async function loadTodaysSales() {
 // ========================================
 async function loadProduce() {
     try {
-        // Get token from localStorage
         const token = localStorage.getItem('kgl_token');
         
         if (!token) {
@@ -129,10 +125,8 @@ async function loadProduce() {
         
         console.log('🔍 Fetching produce for branch:', currentBranch);
         
-        // Show loading state in all possible tables
         showLoadingInAllTables();
         
-        // Pass the token to APIService.getProduce
         const response = await APIService.getProduce(currentBranch, token);
         
         console.log('📥 Load produce response:', response);
@@ -141,17 +135,14 @@ async function loadProduce() {
             produceList = response.produce || [];
             console.log(`✅ Loaded ${produceList.length} produce items`);
             
-            // Update ALL displays
-            updateInventoryDisplay();        // For dashboard table
-            updateDashboardStats();          // For stats cards
-            updateAllDropdowns();            // For all select dropdowns
+            updateInventoryDisplay();
+            updateDashboardStats();
+            updateAllDropdowns();
             
-            // Update inventory page if we're on it
             if (document.getElementById('inventoryTableBody')) {
                 updateInventoryDisplay();
             }
             
-            // Check for low stock and show alert
             checkLowStock();
             
         } else {
@@ -230,9 +221,9 @@ function showErrorState() {
 // ========================================
 function updateAllDropdowns() {
     const dropdowns = [
-        'produceSelect',  // For sales page
-        'productSelect',  // For credit sales
-        'itemSelect'      // For other pages
+        'produceSelect',
+        'productSelect',
+        'itemSelect'
     ];
     
     dropdowns.forEach(id => {
@@ -244,10 +235,9 @@ function updateAllDropdowns() {
 }
 
 // ========================================
-// UPDATE DASHBOARD STATS - FIXED
+// UPDATE DASHBOARD STATS
 // ========================================
 function updateDashboardStats() {
-    // Update total stock
     const totalStockEl = document.getElementById('totalStock');
     const totalProductsEl = document.getElementById('totalProducts');
     const lowStockEl = document.getElementById('lowStock');
@@ -295,13 +285,19 @@ function checkLowStock() {
 }
 
 // ========================================
-// UPDATE INVENTORY DISPLAY
+// UPDATE INVENTORY DISPLAY - DEBUG VERSION
 // ========================================
 function updateInventoryDisplay() {
-    // Update dashboard inventory table
+    console.log('📊 UPDATE INVENTORY DISPLAY CALLED');
+    console.log('📍 Current page:', window.location.pathname);
+    console.log('📦 produceList length:', produceList.length);
+    
     const inventoryBody = document.getElementById('inventoryTableBody');
+    console.log('🔍 inventoryBody exists:', !!inventoryBody);
+    
     if (inventoryBody) {
         if (produceList.length === 0) {
+            console.log('📭 Showing empty state');
             inventoryBody.innerHTML = `
                 <tr>
                     <td colspan="7" style="text-align: center; padding: 40px;">
@@ -311,19 +307,19 @@ function updateInventoryDisplay() {
                 </tr>
             `;
         } else {
+            console.log(`📊 Generating HTML for ${produceList.length} items`);
             let html = '';
             let totalStock = 0;
             let lowStockCount = 0;
             
-            // Sort by date (newest first)
             const sortedList = [...produceList].sort((a, b) => 
                 new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
             );
             
-            sortedList.forEach(item => {
+            sortedList.forEach((item, index) => {
+                console.log(`   Item ${index + 1}:`, item.name, item.tonnage, 'kg');
                 totalStock += item.tonnage || 0;
                 
-                // Determine stock status
                 let statusClass = 'in-stock';
                 let statusText = 'In Stock';
                 
@@ -336,7 +332,6 @@ function updateInventoryDisplay() {
                     lowStockCount++;
                 }
                 
-                // Format date
                 const date = item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Today';
                 
                 html += `
@@ -356,9 +351,9 @@ function updateInventoryDisplay() {
                 `;
             });
             
+            console.log('✅ Setting innerHTML with', sortedList.length, 'rows');
             inventoryBody.innerHTML = html;
             
-            // Update stats
             const totalStockEl = document.getElementById('totalStock');
             const totalProductsEl = document.getElementById('totalProducts');
             const lowStockEl = document.getElementById('lowStock');
@@ -366,7 +361,12 @@ function updateInventoryDisplay() {
             if (totalStockEl) totalStockEl.textContent = totalStock.toLocaleString() + ' kg';
             if (totalProductsEl) totalProductsEl.textContent = produceList.length;
             if (lowStockEl) lowStockEl.textContent = lowStockCount;
+            
+            console.log(`📊 Stats updated: Total: ${totalStock}kg, Products: ${produceList.length}, Low: ${lowStockCount}`);
         }
+    } else {
+        console.log('❌ inventoryTableBody not found - are you on the right page?');
+        console.log('   Dashboard page should have this element');
     }
 }
 
@@ -385,7 +385,6 @@ function setupPage() {
     } else if (path.includes('inventory.html')) {
         setupInventoryPage();
     } else if (path.includes('dashboard.html')) {
-        // Already loaded produce, just update display
         updateInventoryDisplay();
         updateDashboardStats();
     }
@@ -402,7 +401,6 @@ function setupProcurementPage() {
         return;
     }
     
-    // Set default date and time
     const today = new Date().toISOString().split('T')[0];
     const dateInput = document.getElementById('date');
     const timeInput = document.getElementById('time');
@@ -414,16 +412,13 @@ function setupProcurementPage() {
                  now.getMinutes().toString().padStart(2, '0');
     if (timeInput) timeInput.value = time;
     
-    // Remove any existing event listeners by cloning
     const newForm = form.cloneNode(true);
     form.parentNode.replaceChild(newForm, form);
     
-    // Add new submit event listener
     newForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         console.log('📝 Form submitted');
         
-        // Get form values
         const produceData = {
             name: document.getElementById('produceName')?.value,
             type: document.getElementById('produceType')?.value,
@@ -439,7 +434,6 @@ function setupProcurementPage() {
         
         console.log('📝 Submitting procurement:', produceData);
         
-        // Validate all fields
         for (let [key, value] of Object.entries(produceData)) {
             if (!value && value !== 0) {
                 alert(`❌ Please fill in ${key}`);
@@ -447,7 +441,6 @@ function setupProcurementPage() {
             }
         }
         
-        // Validate tonnage
         if (produceData.tonnage < 1000) {
             alert('❌ Tonnage must be at least 1000kg for procurement');
             return;
@@ -468,7 +461,6 @@ function setupProcurementPage() {
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             submitBtn.disabled = true;
             
-            // Call API to create produce
             const response = await APIService.createProduce(produceData, token);
             
             console.log('📥 Server Response:', response);
@@ -476,17 +468,14 @@ function setupProcurementPage() {
             if (response && response.success) {
                 alert('✅ Procurement recorded successfully!');
                 
-                // Reset form but keep date/time
                 e.target.reset();
                 if (dateInput) dateInput.value = today;
                 if (timeInput) timeInput.value = time;
                 
-                // Reload the produce data
                 await loadProduce();
                 
                 console.log('✅ Procurement saved and inventory updated');
                 
-                // If there's a "View Inventory" button, highlight it
                 const viewInventoryBtn = document.querySelector('a[href="inventory.html"]');
                 if (viewInventoryBtn) {
                     viewInventoryBtn.style.animation = 'pulse 1s';
@@ -630,7 +619,7 @@ function setupSalesPage() {
                 alert('✅ Sale recorded successfully!');
                 form.reset();
                 await loadProduce();
-                await loadTodaysSales(); // Reload today's sales
+                await loadTodaysSales();
                 updateProduceDropdown(produceSelect);
             } else {
                 alert('❌ Error: ' + (response.message || 'Failed to record sale'));
@@ -752,7 +741,7 @@ function setupCreditSalesPage() {
                 if (dueDateEl) dueDateEl.value = nextMonth.toISOString().split('T')[0];
                 
                 await loadProduce();
-                await loadTodaysSales(); // Reload today's sales
+                await loadTodaysSales();
                 updateProduceDropdown(produceSelect);
             } else {
                 alert('❌ Error: ' + (response.message || 'Failed to record credit sale'));
@@ -798,4 +787,4 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-console.log('🚀 Manager.js loaded - PROCUREMENT AND TODAY\'S SALES NOW WORK!');
+console.log('🚀 Manager.js loaded - DEBUG VERSION ACTIVE!');
