@@ -42,14 +42,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // DON'T auto-load saved email - user must check "Remember Me" first
-// Only load if they explicitly want it
-const savedEmail = localStorage.getItem('remembered_email');
-if (savedEmail && rememberMeCheckbox.checked) {
-    emailInput.value = savedEmail;
-} else {
-    // Clear any saved but not remembered
-    localStorage.removeItem('remembered_email');
-}
+    const savedEmail = localStorage.getItem('remembered_email');
+    if (savedEmail && rememberMeCheckbox.checked) {
+        emailInput.value = savedEmail;
+    } else {
+        // Clear any saved but not remembered
+        localStorage.removeItem('remembered_email');
+    }
 
     // Add validation listeners
     emailInput.addEventListener('input', validateEmail);
@@ -203,7 +202,7 @@ async function attemptLogin() {
             
             console.log('✅ Login successful! Redirecting to:', response.user.role);
             
-            // ✅ FIXED: Use the correct redirect function
+            // ✅ Use the correct redirect function
             redirectToDashboard(response.user.role);
         } else {
             throw new Error(response?.message || 'Login failed');
@@ -228,12 +227,7 @@ async function attemptLogin() {
 // ========================================
 function redirectToDashboard(role) {
     console.log('➡️ Redirecting to:', role, 'dashboard');
-    console.log('📍 Current path:', window.location.pathname);
     
-    // Get the current path to determine correct relative path
-    const currentPath = window.location.pathname;
-    
-    // Default dashboard paths (relative to pages folder)
     let dashboardPath = '';
     
     switch(role) {
@@ -250,13 +244,11 @@ function redirectToDashboard(role) {
             dashboardPath = 'login.html';
     }
     
-    // Construct the full URL
+    // Construct the full URL correctly
     const baseUrl = window.location.origin;
     const newUrl = baseUrl + '/pages/' + dashboardPath;
     
     console.log('🎯 Redirecting to:', newUrl);
-    
-    // Do the redirect
     window.location.href = newUrl;
 }
 
@@ -271,3 +263,44 @@ window.addEventListener('pageshow', function(event) {
 });
 
 console.log('🚀 Auth.js loaded - FIXED VERSION');
+
+// ========================================
+// OVERRIDE APIService LOGOUT FUNCTIONS
+// ========================================
+// This ensures logout always goes to the right place
+
+// Fix MockAPIService logout if it exists
+if (typeof MockAPIService !== 'undefined' && MockAPIService.logout) {
+    MockAPIService.logout = function() {
+        localStorage.removeItem('kgl_user');
+        localStorage.removeItem('kgl_token');
+        localStorage.removeItem('remembered_email');
+        // Use relative path that works on Netlify
+        window.location.href = '/pages/login.html';
+    };
+}
+
+// Fix RealAPIService logout if it exists
+if (typeof RealAPIService !== 'undefined' && RealAPIService.logout) {
+    RealAPIService.logout = function() {
+        localStorage.removeItem('kgl_user');
+        localStorage.removeItem('kgl_token');
+        localStorage.removeItem('remembered_email');
+        // Use relative path that works on Netlify
+        window.location.href = '/pages/login.html';
+    };
+}
+
+// Also fix the logout button event listener
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('kgl_user');
+            localStorage.removeItem('kgl_token');
+            localStorage.removeItem('remembered_email');
+            window.location.href = '/pages/login.html';
+        });
+    }
+});
