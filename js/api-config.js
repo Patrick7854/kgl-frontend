@@ -318,7 +318,7 @@ const MockAPIService = {
         localStorage.removeItem('kgl_user');
         localStorage.removeItem('kgl_token');
         localStorage.removeItem('remembered_email');
-        window.location.href = '/frontend/pages/login.html';
+        window.location.href = '/pages/login.html';
     },
     
     // GET CURRENT USER
@@ -332,21 +332,21 @@ const MockAPIService = {
         return !!localStorage.getItem('kgl_token') && !!localStorage.getItem('kgl_user');
     },
     
-    // REDIRECT BASED ON ROLE
+    // REDIRECT BASED ON ROLE - FIXED FOR VERCEL
     redirectToDashboard: function(role) {
         console.log('➡️ Redirecting to:', role, 'dashboard');
         switch(role) {
             case 'Director':
-                window.location.href = '/frontend/pages/director/dashboard.html';
+                window.location.href = '/pages/director/dashboard.html';
                 break;
             case 'Manager':
-                window.location.href = '/frontend/pages/manager/dashboard.html';
+                window.location.href = '/pages/manager/dashboard.html';
                 break;
             case 'Sales':
-                window.location.href = '/frontend/pages/sales/dashboard.html';
+                window.location.href = '/pages/sales/dashboard.html';
                 break;
             default:
-                window.location.href = '/frontend/pages/login.html';
+                window.location.href = '/pages/login.html';
         }
     }
 };
