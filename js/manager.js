@@ -1,8 +1,7 @@
 /**
  * KARIBU GROCERIES LTD (KGL) - Manager Dashboard
  * Branches: MAGANJO and MATUGGA
- * Manager can: Add stock, record sales, credit sales, view inventory
- * FULLY FIXED - Procurement and Today's Sales now work!
+ * FULLY FIXED - Procurement now works!
  */
 
 // ========================================
@@ -18,17 +17,14 @@ let produceList = [];
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('📊 Manager Dashboard loaded');
     
-    // Check if user is logged in
     if (!APIService.isAuthenticated()) {
         console.log('❌ Not authenticated, redirecting');
         window.location.href = '/frontend/pages/login.html';
         return;
     }
     
-    // Get current user
     currentUser = APIService.getCurrentUser();
     
-    // Verify user is Manager
     if (currentUser.role !== 'Manager') {
         console.log('❌ Access denied');
         alert('Access denied. Manager only.');
@@ -40,19 +36,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     console.log('✅ Authenticated as:', currentUser.name);
     console.log('🏢 Branch:', currentBranch);
     
-    // Update UI with user info
     updateUserInfo();
-    
-    // Load produce for this branch
     await loadProduce();
-    
-    // Load today's sales
     await loadTodaysSales();
-    
-    // Setup page based on which page we're on
     setupPage();
     
-    // Auto-refresh every 10 seconds
     setInterval(async () => {
         console.log('🔄 Auto-refreshing inventory...');
         await loadProduce();
@@ -64,13 +52,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 // UPDATE USER INFO
 // ========================================
 function updateUserInfo() {
-    const userNameElements = document.querySelectorAll('#userName');
-    userNameElements.forEach(el => {
+    document.querySelectorAll('#userName').forEach(el => {
         if (el) el.textContent = currentUser.name;
     });
     
-    const branchElements = document.querySelectorAll('#branchName, #branchDisplay');
-    branchElements.forEach(el => {
+    document.querySelectorAll('#branchName, #branchDisplay').forEach(el => {
         if (el) el.textContent = currentBranch + ' Branch';
     });
 }
@@ -221,7 +207,7 @@ function checkLowStock() {
 }
 
 // ========================================
-// UPDATE INVENTORY DISPLAY - DEBUG VERSION
+// UPDATE INVENTORY DISPLAY
 // ========================================
 function updateInventoryDisplay() {
     console.log('📊 UPDATE INVENTORY DISPLAY CALLED');
@@ -269,7 +255,7 @@ function updateInventoryDisplay() {
 }
 
 // ========================================
-// UPDATE PRODUCE DROPDOWN - ADD DEBUG
+// UPDATE PRODUCE DROPDOWN
 // ========================================
 function updateProduceDropdown(produceSelect) {
     console.log('🔄 updateProduceDropdown called');
@@ -325,7 +311,7 @@ function setupPage() {
 }
 
 // ========================================
-// SALES PAGE - FIXED VERSION (ONLY ONE!)
+// SALES PAGE
 // ========================================
 function setupSalesPage() {
     console.log('💰 Setting up sales page');
@@ -418,7 +404,7 @@ function setupSalesPage() {
 }
 
 // ========================================
-// CREDIT SALES PAGE - FIXED VERSION
+// CREDIT SALES PAGE
 // ========================================
 function setupCreditSalesPage() {
     console.log('💳 Setting up credit sales page');
@@ -536,64 +522,106 @@ function setupCreditSalesPage() {
 }
 
 // ========================================
-// PROCUREMENT PAGE
+// PROCUREMENT PAGE - COMPLETELY REWRITTEN
 // ========================================
 function setupProcurementPage() {
     console.log('📝 Setting up procurement page');
+    
+    // Get the form
     const form = document.getElementById('procurementForm');
     if (!form) {
-        console.log('❌ Procurement form not found');
+        console.log('❌ Procurement form not found - check HTML');
         return;
     }
     
+    console.log('✅ Procurement form found');
+    
+    // Set default date and time
     const today = new Date().toISOString().split('T')[0];
     const dateInput = document.getElementById('date');
     const timeInput = document.getElementById('time');
     
-    if (dateInput) dateInput.value = today;
+    if (dateInput) {
+        dateInput.value = today;
+        console.log('📅 Date set to:', today);
+    }
     
     const now = new Date();
-    const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
-    if (timeInput) timeInput.value = time;
+    const currentTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    if (timeInput) {
+        timeInput.value = currentTime;
+        console.log('⏰ Time set to:', currentTime);
+    }
     
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
+    // Remove all existing event listeners by creating a fresh form
+    const parent = form.parentNode;
+    const newForm = document.createElement('form');
+    newForm.id = 'procurementForm';
+    newForm.innerHTML = form.innerHTML;
+    parent.replaceChild(newForm, form);
     
+    console.log('🔄 Form recreated with fresh event listener');
+    
+    // Add the submit event listener
     newForm.addEventListener('submit', async function(e) {
         e.preventDefault();
-        console.log('📝 Form submitted');
+        console.log('🎯 FORM SUBMIT EVENT TRIGGERED!');
         
-        const produceData = {
-            name: document.getElementById('produceName')?.value,
-            type: document.getElementById('produceType')?.value,
-            tonnage: parseInt(document.getElementById('tonnage')?.value),
-            cost: parseInt(document.getElementById('cost')?.value),
-            dealerName: document.getElementById('dealerName')?.value,
-            dealerContact: document.getElementById('dealerContact')?.value,
-            sellingPrice: parseInt(document.getElementById('sellingPrice')?.value),
-            branch: currentBranch,
-            date: document.getElementById('date')?.value,
-            time: document.getElementById('time')?.value
-        };
+        // Get all form values
+        const produceName = document.getElementById('produceName')?.value;
+        const produceType = document.getElementById('produceType')?.value;
+        const tonnage = document.getElementById('tonnage')?.value;
+        const cost = document.getElementById('cost')?.value;
+        const dealerName = document.getElementById('dealerName')?.value;
+        const dealerContact = document.getElementById('dealerContact')?.value;
+        const sellingPrice = document.getElementById('sellingPrice')?.value;
+        const date = document.getElementById('date')?.value;
+        const time = document.getElementById('time')?.value;
         
-        console.log('📝 Submitting procurement:', produceData);
+        console.log('📋 Form values:', {
+            produceName, produceType, tonnage, cost,
+            dealerName, dealerContact, sellingPrice,
+            branch: currentBranch, date, time
+        });
         
-        for (let [key, value] of Object.entries(produceData)) {
-            if (!value && value !== 0) {
-                alert(`❌ Please fill in ${key}`);
-                return;
-            }
-        }
-        
-        if (produceData.tonnage < 1000) {
-            alert('❌ Tonnage must be at least 1000kg for procurement');
+        // Validate all fields
+        if (!produceName || !produceType || !tonnage || !cost || !dealerName || 
+            !dealerContact || !sellingPrice || !date || !time) {
+            alert('❌ Please fill in all fields');
+            console.log('❌ Validation failed: missing fields');
             return;
         }
         
+        // Validate tonnage
+        const tonnageNum = parseInt(tonnage);
+        if (tonnageNum < 1000) {
+            alert('❌ Tonnage must be at least 1000kg');
+            console.log('❌ Validation failed: tonnage too low');
+            return;
+        }
+        
+        // Prepare data for API
+        const produceData = {
+            name: produceName,
+            type: produceType,
+            tonnage: tonnageNum,
+            cost: parseInt(cost),
+            dealerName: dealerName,
+            dealerContact: dealerContact,
+            sellingPrice: parseInt(sellingPrice),
+            branch: currentBranch,
+            date: date,
+            time: time
+        };
+        
+        console.log('📦 Prepared produce data:', produceData);
+        
+        // Get submit button
         const submitBtn = e.target.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         
         try {
+            // Get token
             const token = localStorage.getItem('kgl_token');
             if (!token) {
                 alert('Session expired. Please login again.');
@@ -601,32 +629,48 @@ function setupProcurementPage() {
                 return;
             }
             
+            console.log('🔑 Token found, sending API request...');
+            
+            // Show loading state
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             submitBtn.disabled = true;
             
+            // Call API
             const response = await APIService.createProduce(produceData, token);
-            console.log('📥 Server Response:', response);
+            console.log('📥 API Response:', response);
             
             if (response?.success) {
                 alert('✅ Procurement recorded successfully!');
+                console.log('✅ Procurement saved');
+                
+                // Reset form
                 e.target.reset();
                 if (dateInput) dateInput.value = today;
-                if (timeInput) timeInput.value = time;
+                if (timeInput) {
+                    const now = new Date();
+                    timeInput.value = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+                }
+                
+                // Reload data
                 await loadProduce();
-                console.log('✅ Procurement saved and inventory updated');
+                console.log('✅ Inventory refreshed');
+                
             } else {
                 alert('❌ Error: ' + (response?.message || 'Failed to record procurement'));
+                console.log('❌ API error:', response?.message);
             }
         } catch (error) {
-            console.log('❌ Error:', error);
+            console.log('❌ Exception:', error);
             alert('❌ Error recording procurement. Check console for details.');
         } finally {
+            // Restore button
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
+            console.log('🔘 Submit button restored');
         }
     });
     
-    console.log('✅ Procurement page setup complete');
+    console.log('✅ Procurement page setup complete - form ready');
 }
 
 // ========================================
@@ -704,4 +748,4 @@ const style = document.createElement('style');
 style.textContent = `@keyframes pulse {0% { transform: scale(1); }50% { transform: scale(1.05); background-color: var(--gold-light); }100% { transform: scale(1); }}`;
 document.head.appendChild(style);
 
-console.log('🚀 Manager.js loaded - DEBUG VERSION ACTIVE!');
+console.log('🚀 Manager.js loaded - PROCUREMENT FIXED!');
