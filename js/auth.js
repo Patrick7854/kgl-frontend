@@ -38,23 +38,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if (localStorage.getItem('kgl_token') && localStorage.getItem('kgl_user')) {
         const user = JSON.parse(localStorage.getItem('kgl_user'));
         console.log('⚠️ Already logged in as:', user.role);
-        // Don't auto-redirect here - let user stay on login page
     }
 
-    // DON'T auto-load saved email - user must check "Remember Me" first
+    // Load saved email only if remember me was checked
     const savedEmail = localStorage.getItem('remembered_email');
     if (savedEmail && rememberMeCheckbox.checked) {
         emailInput.value = savedEmail;
     } else {
-        // Clear any saved but not remembered
         localStorage.removeItem('remembered_email');
     }
 
-    // Add validation listeners
     emailInput.addEventListener('input', validateEmail);
     passwordInput.addEventListener('input', validatePassword);
     
-    // Enter key support
     passwordInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             loginForm.dispatchEvent(new Event('submit'));
@@ -77,7 +73,6 @@ togglePasswordBtn.addEventListener('click', function() {
 // ========================================
 loginForm.addEventListener('submit', function(e) {
     e.preventDefault();
-    
     clearErrors();
     
     const isEmailValid = validateEmail();
@@ -177,23 +172,18 @@ async function attemptLogin() {
     }
     
     try {
-        // Show loading
         loginBtn.classList.add('loading');
         loginBtn.disabled = true;
         
         console.log('🔍 Attempting login for:', email);
         
-        // Call API
         const response = await APIService.login(email, password);
-        
         console.log('📥 Login response:', response);
         
         if (response && response.success) {
-            // Save user data
             localStorage.setItem('kgl_user', JSON.stringify(response.user));
             localStorage.setItem('kgl_token', response.token);
             
-            // Save email if remember me checked
             if (rememberMe) {
                 localStorage.setItem('remembered_email', email);
             } else {
@@ -201,22 +191,18 @@ async function attemptLogin() {
             }
             
             console.log('✅ Login successful! Redirecting to:', response.user.role);
-            
-            // ✅ Use the correct redirect function
             redirectToDashboard(response.user.role);
         } else {
             throw new Error(response?.message || 'Login failed');
         }
         
     } catch (error) {
-        // Hide loading
         loginBtn.classList.remove('loading');
         loginBtn.disabled = false;
         
         console.log('❌ Login error:', error);
         showErrorMessage(error.message || 'Invalid email or password');
         
-        // Clear password
         passwordInput.value = '';
         passwordInput.focus();
     }
@@ -229,7 +215,6 @@ function redirectToDashboard(role) {
     console.log('➡️ Redirecting to:', role, 'dashboard');
     
     let dashboardPath = '';
-    
     switch(role) {
         case 'Director':
             dashboardPath = 'director/dashboard.html';
@@ -244,7 +229,6 @@ function redirectToDashboard(role) {
             dashboardPath = 'login.html';
     }
     
-    // Construct the full URL correctly
     const baseUrl = window.location.origin;
     const newUrl = baseUrl + '/pages/' + dashboardPath;
     
@@ -253,7 +237,7 @@ function redirectToDashboard(role) {
 }
 
 // ========================================
-// HANDLE PAGE SHOW (browser back button)
+// HANDLE PAGE SHOW
 // ========================================
 window.addEventListener('pageshow', function(event) {
     if (event.persisted) {
@@ -263,34 +247,18 @@ window.addEventListener('pageshow', function(event) {
 });
 
 // ========================================
-// FIXED LOGOUT FUNCTION - SINGLE VERSION
+// LOGOUT FUNCTION
 // ========================================
 function logout() {
     console.log('🚪 Logging out...');
-    localStorage.removeItem('kgl_user');
-    localStorage.removeItem('kgl_token');
-    localStorage.removeItem('remembered_email');
-    
-    // Use absolute path from root
+    localStorage.clear();
     window.location.href = '/pages/login.html';
 }
 
 // ========================================
-// OVERRIDE APIService LOGOUT FUNCTIONS
-// ========================================
-// This ensures logout always goes to the right place
-if (typeof window.APIService !== 'undefined') {
-    const originalLogout = APIService.logout;
-    APIService.logout = function() {
-        logout();
-    };
-}
-
-// ========================================
-// ATTACH LOGOUT TO BUTTONS WHEN DOM IS READY
+// ATTACH LOGOUT TO BUTTONS
 // ========================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Find all logout buttons (there might be multiple)
     const logoutBtns = document.querySelectorAll('.logout-btn, #logoutBtn');
     
     logoutBtns.forEach(btn => {
