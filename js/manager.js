@@ -522,7 +522,7 @@ function setupCreditSalesPage() {
 }
 
 // ========================================
-// PROCUREMENT PAGE - COMPLETELY REWRITTEN
+// PROCUREMENT PAGE - SIMPLIFIED FIX
 // ========================================
 function setupProcurementPage() {
     console.log('📝 Setting up procurement page');
@@ -553,30 +553,27 @@ function setupProcurementPage() {
         console.log('⏰ Time set to:', currentTime);
     }
     
-    // Remove all existing event listeners by creating a fresh form
-    const parent = form.parentNode;
-    const newForm = document.createElement('form');
-    newForm.id = 'procurementForm';
-    newForm.innerHTML = form.innerHTML;
-    parent.replaceChild(newForm, form);
+    // Remove any existing event listeners by replacing with a clone
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
     
-    console.log('🔄 Form recreated with fresh event listener');
+    console.log('🔄 Form cloned, adding fresh event listener');
     
-    // Add the submit event listener
+    // Add the submit event listener to the new form
     newForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         console.log('🎯 FORM SUBMIT EVENT TRIGGERED!');
         
-        // Get all form values
-        const produceName = document.getElementById('produceName')?.value;
-        const produceType = document.getElementById('produceType')?.value;
-        const tonnage = document.getElementById('tonnage')?.value;
-        const cost = document.getElementById('cost')?.value;
-        const dealerName = document.getElementById('dealerName')?.value;
-        const dealerContact = document.getElementById('dealerContact')?.value;
-        const sellingPrice = document.getElementById('sellingPrice')?.value;
-        const date = document.getElementById('date')?.value;
-        const time = document.getElementById('time')?.value;
+        // Get all form values from the new form
+        const produceName = newForm.querySelector('#produceName')?.value;
+        const produceType = newForm.querySelector('#produceType')?.value;
+        const tonnage = newForm.querySelector('#tonnage')?.value;
+        const cost = newForm.querySelector('#cost')?.value;
+        const dealerName = newForm.querySelector('#dealerName')?.value;
+        const dealerContact = newForm.querySelector('#dealerContact')?.value;
+        const sellingPrice = newForm.querySelector('#sellingPrice')?.value;
+        const date = newForm.querySelector('#date')?.value;
+        const time = newForm.querySelector('#time')?.value;
         
         console.log('📋 Form values:', {
             produceName, produceType, tonnage, cost,
@@ -617,7 +614,7 @@ function setupProcurementPage() {
         console.log('📦 Prepared produce data:', produceData);
         
         // Get submit button
-        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const submitBtn = newForm.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         
         try {
@@ -644,7 +641,7 @@ function setupProcurementPage() {
                 console.log('✅ Procurement saved');
                 
                 // Reset form
-                e.target.reset();
+                newForm.reset();
                 if (dateInput) dateInput.value = today;
                 if (timeInput) {
                     const now = new Date();
